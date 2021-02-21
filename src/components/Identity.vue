@@ -28,17 +28,18 @@
 </template>
 
 <script>
-import nacl from 'tweetnacl';
+// We could support different identicon styles or libraries, robots, mosters etc.
+// and let the user choose.
+import PeerId from 'peer-id';
 import Identicon from 'identicon.js';
-
-
-const IMG_SIZE = {
-  width: 80,
-  height: 80
-};
+import config from '@/config';
 
 
 export default {
+  props: {
+    value: Object,
+  },
+
   created() {
     this.roll();
   },
@@ -46,16 +47,18 @@ export default {
   data() {
     return {
       dimensions: {
-        width: IMG_SIZE.width,
-        height: IMG_SIZE.height,
+        width: config.IDENTICON.WIDTH,
+        height: config.IDENTICON.HEIGHT,
       },
-      identity: null,
     };
   },
 
   computed: {
     identicon() {
-      return new Identicon(this.identity, IMG_SIZE.width).toString();
+      if (!this.value.id) {
+        return;
+      }
+      return new Identicon(this.value.id, config.IDENTICON.WIDTH).toString();
     }
   },
 
@@ -63,8 +66,11 @@ export default {
     roll() {
       // TODO: this needs to generate a key pair for js-ipfs and use the public key for the identicon.
       // This key must then be used when connecting to the network.
-      const random = nacl.randomBytes(32);
-      this.identity = btoa(nacl.hash(random));
+      PeerId.create(config.PEER_KEY_OPTS).then((id) => {
+        const value = id.toJSON();
+        value.id = id.toHexString();
+        this.$emit('input', value);
+      });
     },
   }
 }

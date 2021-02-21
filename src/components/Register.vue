@@ -50,9 +50,13 @@
               <v-container>
                 <v-row>
                   <v-spacer/>
-                  <Avatar/>
+                  <Avatar
+                    v-model="user.avatar"
+                  />
                   <v-spacer/>
-                  <Identicon/>
+                  <Identity
+                    v-model="user.identity"
+                  />
                   <v-spacer/>
                 </v-row>
               </v-container>
@@ -78,13 +82,13 @@
 
 <script>
 import Avatar from '@/components/Avatar';
-import Identicon from '@/components/Identicon';
+import Identity from '@/components/Identity';
 
 
 export default {
   components: {
     Avatar,
-    Identicon,
+    Identity,
   },
 
   props: {
@@ -101,6 +105,10 @@ export default {
         confirm: null,
         email: null,
         password: null,
+        avatar: null,
+        identity: {
+          id: null,
+        },
       }
     };
   },

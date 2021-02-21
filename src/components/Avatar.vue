@@ -6,10 +6,10 @@
         justify="center"
       >
         <v-img
-          :src="`${baseUrl}${avatars.images[avatars.current]}`"
-          :width="avatars.dimensions.width"
-          :max-width="avatars.dimensions.width"
-          :height="avatars.dimensions.height"
+          :src="`${baseUrl}${current}`"
+          :width="dimensions.width"
+          :max-width="dimensions.width"
+          :height="dimensions.height"
         ></v-img>
       </v-row>
       <v-row
@@ -43,54 +43,44 @@
 </template>
 
 <script>
-// TODO: replace / expand these. Can support multiple sets.
-const IMG_BASE = 'avatars/avatar-{}.png';
-const IMG_COUNT = 15;
-const IMG_SIZE = {
-  width: 80,
-  height: 80
-};
+// TODO: replace / expand avatar libraries. Can support multiple sets.
+import config from '@/config';
+
+const PADDING = config.AVATAR.IMG_COUNT.toString().length;
 
 
 export default {
-  created() {
-    const padding = IMG_COUNT.toString().length;
-
-    for (let i = 0; i <= IMG_COUNT; i++) {
-      this.avatars.images.push(IMG_BASE.replace('{}', i.toString().padStart(padding, '0')));
-    }
-    this.roll();
+  data() {
+    return {
+      baseUrl: `${process.env.BASE_URL}${config.AVATAR.IMG_BASE}`,
+      index: 0,
+      dimensions: {
+        width: config.AVATAR.WIDTH,
+        height: config.AVATAR.HEIGHT,
+      }
+    };
   },
 
-  data() {
-
-    return {
-      baseUrl: process.env.BASE_URL,
-      avatars: {
-        current: 0,
-        images: [],
-        dimensions: {
-          width: IMG_SIZE.width,
-          height: IMG_SIZE.height,
-        }
-      },
-    };
+  computed: {
+    current() {
+      return config.AVATAR.IMG_NAME.replace('{}', this.index.toString().padStart(PADDING, '0'));
+    },
   },
 
   methods: {
     roll() {
-      this.avatars.current = Math.round(Math.random() * IMG_COUNT);
+      this.index = Math.round(Math.random() * config.AVATAR.IMG_COUNT);
     },
 
     next() {
-      if (++this.avatars.current == this.avatars.images.length) {
-        this.avatars.current = 0;
+      if (++this.index > config.AVATAR.IMG_COUNT) {
+        this.index = 0;
       }
     },
 
     prev() {
-      if (--this.avatars.current < 0) {
-        this.avatars.current = this.avatars.images.length - 1;
+      if (--this.index < 0) {
+        this.index = config.AVATAR.IMG_COUNT;
       }
     },
   }
