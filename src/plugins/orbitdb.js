@@ -27,7 +27,7 @@ export default class VueOrbitDB {
     }*/
   }
 
-  async connect({ IpfsOptions, }, onOpen) {
+  async connect({ IpfsOptions, }) {
     const options = {
       ...IPFSOPTIONS,
       ...IpfsOptions,
@@ -36,9 +36,6 @@ export default class VueOrbitDB {
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
     this.databases = {};
-
-    // Let caller do some initialization.
-    await onOpen(this);
   }
 
   async shutdown() {

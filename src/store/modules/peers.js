@@ -2,6 +2,7 @@
 const state = {
   peers: {
     count: 0,
+    usernames: new Map(),
   },
   global: [],
   following: [],
@@ -24,8 +25,10 @@ const actions = {
   },
 
   discovery({ commit }, obj) {
-    obj;
-    commit('incrPeers', 1);
+    commit('addPeer', {
+      id: obj.message.from,
+      username: obj.data.username
+    });
   },
 };
 
@@ -34,8 +37,13 @@ const mutations = {
     state.following.push(obj);
   },
 
-  incrPeers(state, count) {
-    state.peers.count += count;
+  addPeer(state, obj) {
+    if (state.peers.usernames.has(obj.id)) {
+      return;
+    }
+
+    state.peers.usernames.set(obj.id, obj.username);
+    state.peers.count++;
   }
 };
 

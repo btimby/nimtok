@@ -22,3 +22,5 @@ new Vue({
   orbitdb,
   render: h => h(App)
 }).$mount('#app')
+
+store.dispatch('auth/tryLogin');

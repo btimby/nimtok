@@ -15,17 +15,53 @@ function passwordKey(password) {
   return key;
 }
 
-/*var me = null;
-try {
-  me = JSON.parse(sessionStorage.getItem('auth:me'));
-  if (me) {
-    // User is set...
-    Net.init(me);
-  }
-} catch (e) {
-  console.error(e);
-  console.warn('User not present in sessionStorage');
-}*/
+async function initDb(user) {
+  const IpfsOptions = {
+    repo: user.username,
+    relay: {
+      enabled: true,
+      hop: {
+        enabled: true,
+        active: true,
+      },
+    },
+    config: {
+      Addresses: {
+        Swarm: [
+          config.SWARM_ADDR,
+        ],
+      },
+    },
+  };
+
+  await orbitdb.connect({ IpfsOptions });
+  
+  // Open our databases here.
+  orbitdb.add('profile', await orbitdb.odb.keyvalue('profile'));
+  orbitdb.add('posts', await orbitdb.odb.feed('posts'));
+  orbitdb.add('following', await orbitdb.odb.docs('following'));
+  orbitdb.add('peers', await orbitdb.odb.docs('peers'));
+  orbitdb.add('hashtags', await orbitdb.odb.keyvalue('hashtags'));
+
+  // Collect node information for discovery.
+  const nodeInfo = {
+    username: user.username,
+    profile: orbitdb.databases.profile.id,
+    peers: orbitdb.databases.peers.id,
+    posts: orbitdb.databases.posts.id,
+  };
+  
+  // Set up pubsub.
+  orbitdb.subscribe('discovery', 'peers/discovery');
+  orbitdb.subscribe('discovery', ({ message }) => {
+    orbitdb.publish(message.from, nodeInfo);
+  });
+  orbitdb.subscribe(orbitdb.id.id, 'peers/discovery');
+
+  setTimeout(() => {
+    orbitdb.publish('discovery', nodeInfo);
+  }, 2000);
+}
 
 const state = {
   me: null,
@@ -66,54 +102,30 @@ const actions = {
       throw new Error('Invalid username or password');
     }
 
-    commit('setMe', user);
-    const IpfsOptions = {
-      repo: user.username,
-      relay: {
-        enabled: true,
-        hop: {
-          enabled: true,
-          active: true,
-        },
-      },
-      config: {
-        Addresses: {
-          Swarm: [
-            config.SWARM_ADDR,
-          ],
-        },
-      },
-    };
-    orbitdb
-      .connect({ IpfsOptions }, async (db) => {
-        // Open our databases here.
-        db.add('profile', await db.odb.keyvalue('profile'));
-        db.add('posts', await db.odb.feed('posts'));
-        db.add('following', await db.odb.docs('following'));
-        db.add('peers', await db.odb.docs('peers'));
-        db.add('hashtags', await db.odb.keyvalue('hashtags'));
-
-        // Collect node information for discovery.
-        const nodeInfo = {
-          username: user.username,
-          profile: db.databases.profile.id,
-          peers: db.databases.peers.id,
-          posts: db.databases.posts.id,
-        };
-        
-        // Set up pubsub.
-        db.subscribe('discovery', 'peers/discovery');
-        db.subscribe('discovery', ({ message }) => {
-          db.publish(message.from, nodeInfo);
-        });
-        db.subscribe(db.id.id, 'peers/discovery');
-
-        setTimeout(() => {
-          db.publish('discovery', nodeInfo);
-        }, 2000);
+    initDb(user)
+      .then(() => {
+        commit('setMe', user);
+        router.replace(next);
       })
       .catch(console.error);
-    router.replace(next);
+  },
+
+  tryLogin({ commit }) {
+    try {
+      const savedUser = JSON.parse(sessionStorage.getItem('auth:me'));
+    
+      if (savedUser) {
+        initDb(savedUser)
+          .then(() => {
+            commit('setMe', savedUser);
+            router.replace('/feed');
+          })
+          .catch(console.error);
+      }
+    } catch (e) {
+      console.error(e);
+      console.warn('User not present in sessionStorage');
+    }    
   },
 
   logout({ commit }, obj) {
