@@ -13,7 +13,6 @@ export default class VueOrbitDB {
   constructor({ store }) {
     this._store = store;
     this._actions = new Map();
-    this._callbacks = new Map();
     this.node = null;
     this.odb = null;
   }
@@ -90,21 +89,21 @@ export default class VueOrbitDB {
     for (let i in message.topicIDs) {
       const topic = message.topicIDs[i];
 
-      if (this._actions.has(topic)) {
-        this._actions.get(topic).forEach((action) => {
-          this._store.dispatch(action, args);
-        });
+      if (!this._actions.has(topic)) {
+        continue;
       }
-      if (this._callbacks.has(topic)) {
-        this._callbacks.get(topic).forEach((callback) => {
+
+      this._actions.get(topic).forEach((action) => {
+        if (typeof action === 'string') {
+          this._store.dispatch(action, args);
+        } else {
           try {
-            callback(args);
+            action(args);
           } catch(e) {
             console.error(e);
           }
-        })
-      }
-
+        }
+      });
     }
   }
 
@@ -113,17 +112,14 @@ export default class VueOrbitDB {
       throw new Error('OrbitDB not connected.');
     }
 
-    const registered = (this._callbacks.has(topic) || this._actions.has(topic));
-    const map = (typeof action === 'function') ? this._callbacks : this._actions;
-
     // NOTE: set up routing for messages to vuex actions.
-    if (!map.has(topic)) map.set(topic, []);
-    map.get(topic).push(action);
-
-    // Set up pubsub subscription, but ensure it is only registered once.
-    if (!registered) {
+    if (!this._actions.has(topic)) {
+      this._actions.set(topic, []);
+      // Set up pubsub subscription, but ensure it is only registered once.
       await this.node.pubsub.subscribe(topic, this._dispatch.bind(this));
     }
+
+    this._actions.get(topic).push(action);
   }
 
   async publish(topic, data) {
@@ -132,7 +128,6 @@ export default class VueOrbitDB {
     }
 
     data = JSON.stringify(data);
-    console.log('publish()', topic, data);
     await this.node.pubsub.publish(topic, data);
   }
 }

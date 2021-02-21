@@ -24,21 +24,9 @@ const actions = {
   },
 
   discovery({ commit }, obj) {
-    console.log('peers/discovery');
     obj;
     commit('incrPeers', 1);
   },
-
-  /*countUsers({ commit }) {
-    net
-      .getPeers()
-      .then((users) => {
-        if (users) {
-          commit('updateCount', users.length);
-        }
-      })
-      .catch(console.error);
-  }*/
 };
 
 const mutations = {
