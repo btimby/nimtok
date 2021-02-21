@@ -1,5 +1,8 @@
 import nacl from 'tweetnacl';
 import b58 from 'b58';
+import router from '@/router';
+import orbitdb from '@/orbitdb';
+import config from '@/config';
 
 
 function passwordKey(password) {
@@ -12,15 +15,20 @@ function passwordKey(password) {
   return key;
 }
 
-var me = null;
+/*var me = null;
 try {
   me = JSON.parse(sessionStorage.getItem('auth:me'));
+  if (me) {
+    // User is set...
+    Net.init(me);
+  }
 } catch (e) {
+  console.error(e);
   console.warn('User not present in sessionStorage');
-}
+}*/
 
 const state = {
-  me,
+  me: null,
 };
 
 const getters = {
@@ -35,12 +43,16 @@ const getters = {
 
 const actions = {
   login({ commit }, obj) {
-    if (!obj.username || !obj.password) {
-      throw new Error('Invalid user object, must have username and password.');
+    const { next, user } = obj;
+
+    if (!user.username || !user.password) {
+      throw new Error('Invalid user, must have username and password.');
     }
 
-    const key = passwordKey(obj.password);
-    const auth = JSON.parse(localStorage.getItem(`auth:${obj.username}`));
+    const key = passwordKey(user.password);
+    delete user.password;
+
+    const auth = JSON.parse(localStorage.getItem(`auth:${user.username}`));
     if (!auth) {
       throw new Error('Invalid username or password');
     }
@@ -54,29 +66,82 @@ const actions = {
       throw new Error('Invalid username or password');
     }
 
-    commit('setMe', obj);
+    commit('setMe', user);
+    const IpfsOptions = {
+      repo: user.username,
+      relay: {
+        enabled: true,
+        hop: {
+          enabled: true,
+          active: true,
+        },
+      },
+      config: {
+        Addresses: {
+          Swarm: [
+            config.SWARM_ADDR,
+          ],
+        },
+      },
+    };
+    orbitdb
+      .connect({ IpfsOptions }, async (db) => {
+        // Open our databases here.
+        db.add('profile', await db.odb.keyvalue('profile'));
+        db.add('posts', await db.odb.feed('posts'));
+        db.add('following', await db.odb.docs('following'));
+        db.add('peers', await db.odb.docs('peers'));
+        db.add('hashtags', await db.odb.keyvalue('hashtags'));
+
+        // Collect node information for discovery.
+        const nodeInfo = {
+          username: user.username,
+          profile: db.databases.profile.id,
+          peers: db.databases.peers.id,
+          posts: db.databases.posts.id,
+        };
+        
+        // Set up pubsub.
+        db.subscribe('discovery', 'peers/discovery');
+        db.subscribe('discovery', ({ message }) => {
+          db.publish(message.from, nodeInfo);
+        });
+        db.subscribe(db.id.id, 'peers/discovery');
+
+        setTimeout(() => {
+          db.publish('discovery', nodeInfo);
+        }, 2000);
+      })
+      .catch(console.error);
+    router.replace(next);
   },
 
-  logout({ commit }) {
+  logout({ commit }, obj) {
+    const { next } = obj;
     commit('delMe');
+    // Net.shutdown();
+    router.replace(next);
   },
 
   create({ commit }, obj) {
-    if (!obj.username || !obj.password) {
+    const { next, user } = obj;
+
+    if (!user.username || !user.password) {
       throw new Error('Invalid user object, must have username and password.');
     }
 
-    const key = passwordKey(obj.password);
+    const key = passwordKey(user.password);
     delete obj.password;
 
     const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
     const auth = {
-      msg: b58.encode(nacl.secretbox(new Uint8Array(JSON.stringify(obj)), nonce, key)),
+      msg: b58.encode(nacl.secretbox(new Uint8Array(JSON.stringify(user)), nonce, key)),
       nonce: b58.encode(nonce),
     }
 
-    localStorage.setItem(`auth:${obj.username}`, JSON.stringify(auth));
+    localStorage.setItem(`auth:${user.username}`, JSON.stringify(auth));
     commit('setMe', obj);
+    router.replace(next);
   }
 };
 

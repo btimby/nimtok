@@ -68,6 +68,10 @@
 
 <script>
 export default {
+  props: {
+    next: null,
+  },
+
   data() {
     return {
       show: false,
@@ -83,7 +87,7 @@ export default {
 
   methods: {
     onRegister() {
-      this.$store.dispatch('auth/create', this.user);
+      this.$store.dispatch('auth/create', { next: this.next, user: this.user });
       this.dialog = false;
     },
   },

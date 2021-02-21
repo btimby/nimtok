@@ -59,6 +59,10 @@
 
 <script>
 export default {
+  props: {
+    next: null,
+  },
+
   data() {
     return {
       show: false,
@@ -73,7 +77,7 @@ export default {
 
   methods: {
     onLogin() {
-      this.$store.dispatch('auth/login', this.user);
+      this.$store.dispatch('auth/login', { next: this.next, user: this.user });
       this.display = false;
     },
   },

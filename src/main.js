@@ -1,16 +1,24 @@
-import Vue from 'vue'
-import App from '@/App.vue'
-import vuetify from '@/plugins/vuetify';
+import Vue from 'vue';
+import Vue2Filters from 'vue2-filters';
+import App from '@/App.vue';
+import router from '@/router';
+import orbitdb from '@/orbitdb';
 import store from '@/store';
-
+import vuetify from '@/vuetify';
 
 Vue.config.productionTip = false
+// TODO: remove logging...
+// window.LOG = 'orbit*'; 
+// localStorage.setItem('debug', 'ipfs:*');
+localStorage.removeItem('debug');
 
-// TODO: remove this...
-window.LOG='orbit*';
+Vue.use(Vue2Filters);
+
 
 new Vue({
   vuetify,
   store,
+  router,
+  orbitdb,
   render: h => h(App)
 }).$mount('#app')

@@ -1,7 +1,3 @@
-import net from '@/services/network';
-
-
-net;
 
 const state = {
   posts: [],
@@ -14,18 +10,24 @@ const getters = {
 };
 
 const actions = {
-  create({ commit }, obj) {
-    // TODO: store in database etc.
-    net.onready(() => {
-      net._posts
-        .add(obj)
-        .then((hash) => {
+  /*create({ commit }, obj) {
+    return new Promise((resolve, reject) => {
+      Net.onready(async () => {
+        let hash;
+
+        try {
+          hash = await Net.addPost(obj);
           console.log(`Added post: ${hash}`);
           commit('addPost', obj);
-        })
-        .catch(console.error);
+        } catch (e) {
+          reject(e);
+          return;
+        }
+
+        resolve(hash);
+      });
     });
-  },
+  },*/
 };
 
 const mutations = {

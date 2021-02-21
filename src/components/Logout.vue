@@ -10,9 +10,13 @@
 
 <script>
 export default {
+  props: {
+    next: null,
+  },
+
   methods: {
     onLogout() {
-      this.$store.dispatch('auth/logout');
+      this.$store.dispatch('auth/logout', { next: this.next });
     }
   }
 }
