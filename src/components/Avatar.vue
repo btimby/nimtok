@@ -5,7 +5,12 @@
         align="center"
         justify="center"
       >
-        <img :src="`${baseUrl}${avatars.images[avatars.current]}`"/>
+        <v-img
+          :src="`${baseUrl}${avatars.images[avatars.current]}`"
+          :width="avatars.dimensions.width"
+          :max-width="avatars.dimensions.width"
+          :height="avatars.dimensions.height"
+        ></v-img>
       </v-row>
       <v-row
         align="center"

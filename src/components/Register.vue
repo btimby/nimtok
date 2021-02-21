@@ -47,8 +47,15 @@
               />
             </v-col>
             <v-col>
-              <Avatar
-              />
+              <v-container>
+                <v-row>
+                  <v-spacer/>
+                  <Avatar/>
+                  <v-spacer/>
+                  <Identicon/>
+                  <v-spacer/>
+                </v-row>
+              </v-container>
             </v-col>
           </v-row>
         </v-container>
@@ -71,11 +78,13 @@
 
 <script>
 import Avatar from '@/components/Avatar';
+import Identicon from '@/components/Identicon';
 
 
 export default {
   components: {
     Avatar,
+    Identicon,
   },
 
   props: {

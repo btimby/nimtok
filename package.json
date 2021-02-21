@@ -10,6 +10,7 @@
   "dependencies": {
     "b58": "^4.0.3",
     "core-js": "^3.6.5",
+    "identicon.js": "^2.3.3",
     "ipfs": "^0.54.2",
     "libp2p-webrtc-star": "^0.21.1",
     "orbit-db": "^0.26.0",
