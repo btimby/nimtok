@@ -27,8 +27,6 @@
                 required
               />
             </v-col>
-          </v-row>
-          <v-row>
             <v-col>
               <v-text-field
                 v-model="user.username"
@@ -41,10 +39,15 @@
             <v-col>
               <v-text-field
                 v-model="user.password"
+                label="password"
                 :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="show ? 'text' : 'password'"
                 counter
                 @click:append="show = !show"
+              />
+            </v-col>
+            <v-col>
+              <Avatar
               />
             </v-col>
           </v-row>
@@ -67,7 +70,14 @@
 </template>
 
 <script>
+import Avatar from '@/components/Avatar';
+
+
 export default {
+  components: {
+    Avatar,
+  },
+
   props: {
     next: null,
   },
@@ -79,6 +89,7 @@ export default {
 
       user: {
         username: null,
+        confirm: null,
         email: null,
         password: null,
       }
