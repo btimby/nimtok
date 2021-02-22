@@ -35,17 +35,29 @@ async function initDb(user) {
   };
 
   await orbitdb.connect({ IpfsOptions });
-  
+
   // Open our databases here.
   orbitdb.add('profile', await orbitdb.odb.keyvalue('profile'));
+  // Our posts go here.
   orbitdb.add('posts', await orbitdb.odb.feed('posts'));
+  // Whom we follow.
   orbitdb.add('following', await orbitdb.odb.docs('following'));
+  // discovered peers.
   orbitdb.add('peers', await orbitdb.odb.docs('peers'));
   // Open global, world writable database.
-  orbitdb.add('hashtags', await orbitdb.odb.open(config.HASHTAG_DB));
-  // Create databases that other users can write to.
-  await orbitdb.addOrCreate('inbox', 'feed', { accessController: ['*'] });
-  await orbitdb.addOrCreate('followers', 'docs', { accessController: ['*'] });
+  orbitdb.add('hashtags', await orbitdb.odb.open(config.HASHTAG_DB, 'keyvalue'));
+  // Inbox for direct messages.
+  await orbitdb.openOrCreate('inbox', 'feed', {
+    accessController: {
+      write: ['*'],
+    },
+  });
+  // Other users can write to this database to follow us.
+  await orbitdb.openOrCreate('followers', 'docstore', {
+    accessController: {
+      write: ['*'],
+    },
+   });
 
   orbitdb.databases.inbox.events.on('replicated', () => {
     console.log('Received a DM.');

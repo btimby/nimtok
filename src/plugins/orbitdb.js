@@ -2,6 +2,7 @@
 import Ipfs from 'ipfs';
 import OrbitDB from 'orbit-db';
 
+const DB_ADDR = /'(\/orbitdb\/\w+\/\w+)'/;
 const IPFSOPTIONS = {
   EXPERIMENTAL: {
     pubsub: true,
@@ -50,20 +51,24 @@ export default class VueOrbitDB {
   }
 
   // TODO: this should be implemented within orbitdb.
-  async addOrCreate(name, type, options) {
+  async openOrCreate(name, type, options) {
     let db;
 
     try {
-      db = await orbitdb.odb.create(name, type, options);
-    } catch(e) {
-      // If the error is that the database exists, open it.
+      db = await this.odb.create(name, type, options);
+    } catch (e) {
       if (e.message.indexOf('exists') === -1) {
         throw e;
       }
-      db = await orbitdb.odb.open(name);
+      const m = DB_ADDR.exec(e.message);
+      if (!m) {
+        throw new Error('Database exists, could not parse address');
+      }
+      const address = m[1];
+      db = await this.odb.open(address, type);
     }
 
-    this.add('inbox', db);
+    this.add(name, db);
   }
 
   close(name) {
