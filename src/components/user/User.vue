@@ -12,7 +12,9 @@
           :width="24"
           :height="24"
         />
-        {{ usernameOrDefault }}
+        <span
+          :title="usernameOrDefault"
+        >{{ usernameOrDefault | truncate(10) }}</span>
       </span>
     </v-row>
   </v-container>

@@ -22,12 +22,15 @@
         v-if="!authenticated"
         next="/feed"
       />
-      <Publish
-        v-if="authenticated"
-      />
     </v-app-bar>
     <v-main>
-      <router-view/>
+      <v-container>
+        <v-row>
+          <v-col offset="3" cols="6">
+            <router-view/>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-main>
     <Footer/>
   </v-app>
@@ -37,7 +40,6 @@
 import Login from '@/components/Login';
 import Logout from '@/components/Logout';
 import Register from '@/components/register/Register';
-import Publish from '@/components/Publish';
 import Footer from '@/components/Footer';
 import { mapGetters } from 'vuex';
 
@@ -49,7 +51,6 @@ export default {
     Login,
     Logout,
     Register,
-    Publish,
     Footer,
   },
 

@@ -1,6 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
+    max-width="800"
   >
     <template v-slot:activator="{ on }">
       <v-btn
@@ -37,6 +38,7 @@
                 v-model="user.username"
                 :rules="rules.username"
                 label="username"
+                counter
                 required
               />
             </v-col>
@@ -86,7 +88,6 @@
           <v-btn
             :disabled="!valid"
             type="submit"
-            @click.prevent="onRegister"
           >
             Register
           </v-btn>
@@ -102,6 +103,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import ChooseAvatar from '@/components/register/ChooseAvatar';
 import ChooseIdentity from '@/components/register/ChooseIdentity';
 import User from '@/components/user/User';
@@ -119,6 +121,10 @@ export default {
     next: null,
   },
 
+  computed: {
+    ...mapGetters({users: 'auth/users'}),
+  },
+
   data() {
     return {
       show: false,
@@ -127,20 +133,19 @@ export default {
 
       user: {
         username: null,
-        confirm: null,
         email: null,
         password: null,
         avatar: null,
-        identity: {
-          id: null,
-        },
+        identity: {},
         bio: null,
       },
 
       rules: {
         username: [
+          v => !this.users[v] || 'Username already used',
           v => !!v || 'Username is required',
-          v => (v && 8 <= v.length <= 32) || 'User must be between 8 and 32 chars',
+          v => (v && v.length >= config.USERNAME.MIN_LENGTH && v.length <= config.USERNAME.MAX_LENGTH) || 'User must be between 8 and 32 chars',
+          v => config.PATTERN_USERNAME.test(v) || 'Username contains invalid chars.',
         ],
         email: [
           v => !!v || 'Email is required',
@@ -148,8 +153,8 @@ export default {
         ],
         password: [
           v => !!v || 'Password is required',
-          v => (v && v.length <= 8) || 'Password must be at least 8 chars.',
-          v => config.PATTERN_USERNAME.test(v) || 'Password must contain at least lowercase letter, one number, a special character and one uppercase letter',
+          v => (v && v.length >= 8) || 'Password must be at least 8 chars.',
+          v => config.PATTERN_PASSWORD.test(v) || 'Password must contain at least lowercase letter, one number, a special character and one uppercase letter',
         ],
       },
 
@@ -158,7 +163,10 @@ export default {
 
   methods: {
     onRegister() {
-      this.$store.dispatch('auth/create', { next: this.next, user: this.user });
+      this.$store.dispatch('auth/create', {
+        next: this.next,
+        user: this.user,
+      });
       this.dialog = false;
     },
   },

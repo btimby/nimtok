@@ -24,7 +24,7 @@ export default {
     value: Object,
   },
 
-  created() {
+  mounted() {
     this.roll();
   },
 

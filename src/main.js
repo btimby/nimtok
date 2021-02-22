@@ -20,7 +20,8 @@ new Vue({
   store,
   router,
   orbitdb,
-  render: h => h(App)
-}).$mount('#app')
+  render: h => h(App),
+}).$mount('#app');
 
 store.dispatch('auth/tryLogin');
+store.commit('auth/loadUsers');

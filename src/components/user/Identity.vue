@@ -31,6 +31,10 @@ export default {
 
   computed: {
     shortCode() {
+      if (!this.hash) {
+        return;
+      }
+
       return this.hash.slice(-8).split('').reverse().join('');
     }
   },

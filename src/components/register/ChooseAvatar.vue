@@ -42,6 +42,9 @@ const BASE_URL = `${process.env.BASE_URL}${config.AVATAR.IMG_BASE}`
 
 
 function urlToDataUrl(url) {
+  /*
+  Load an image off-screen and extract it as a data url.
+  */
   const image = document.createElement('img');
   image.src = url;
 

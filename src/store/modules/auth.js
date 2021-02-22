@@ -3,6 +3,7 @@ import b58 from 'b58';
 import router from '@/router';
 import orbitdb from '@/orbitdb';
 import config from '@/config';
+import { str2arr, arr2str } from '@/utils';
 
 
 function passwordKey(password) {
@@ -15,9 +16,43 @@ function passwordKey(password) {
   return key;
 }
 
+function serializeUser(user) {
+  // Serialize the user for storage. The user should consist of public and private fields.
+  const key = passwordKey(user.password);
+  const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
+  const secret = {
+    identity: user.identity,
+  };
+  const obj = {
+    ...user,
+    id: user.identity.id,
+    secret: b58.encode(nacl.secretbox(str2arr(JSON.stringify(secret)), nonce, key)),
+    nonce: b58.encode(nonce),
+  };
+  delete obj.password;
+
+  return obj;
+}
+
+function deserializeUser(obj, password) {
+  const key = passwordKey(password);
+  const nonce = b58.decode(obj.nonce);
+  let secret = nacl.secretbox.open(b58.decode(obj.secret), nonce, key);
+  if (secret === null) {
+    return null;
+  }
+  secret = JSON.parse(arr2str(secret));
+  const user = {
+    ...obj,
+    ...secret,
+  };
+  return user;
+}
+
 async function initDb(user) {
   const IpfsOptions = {
     repo: user.username,
+    privateKey: user.identity.privKey,
     relay: {
       enabled: true,
       hop: {
@@ -87,6 +122,7 @@ async function initDb(user) {
 
 const state = {
   me: null,
+  users: {},
 };
 
 const getters = {
@@ -96,38 +132,37 @@ const getters = {
 
   authenticated: state => {
     return Boolean(state.me);
-  }
+  },
+
+  users: state => {
+    return state.users;
+  },
 };
 
 const actions = {
   login({ commit }, obj) {
-    const { next, user } = obj;
+    const { next, username, password } = obj;
 
-    if (!user.username || !user.password) {
-      throw new Error('Invalid user, must have username and password.');
-    }
-
-    const key = passwordKey(user.password);
-    delete user.password;
-
-    const auth = JSON.parse(localStorage.getItem(`auth:${user.username}`));
+    const auth = JSON.parse(localStorage.getItem(`auth:${username}`));
     if (!auth) {
       throw new Error('Invalid username or password');
     }
 
-    const msg = b58.decode(auth.msg);
-    const nonce = b58.decode(auth.nonce);
+    const user = deserializeUser(auth, password);
 
-    obj = nacl.secretbox.open(msg, nonce, key);
-
-    if (obj === null) {
+    if (user === null) {
       throw new Error('Invalid username or password');
     }
 
     initDb(user)
       .then(() => {
+        // Don't store sensitive fields in session.
+        delete user.nonce;
+        delete user.secret;
         commit('setMe', user);
-        router.replace(next);
+        if (router.currentRoute.path !== next) {
+          router.push(next);
+        }
       })
       .catch(console.error);
   },
@@ -135,12 +170,14 @@ const actions = {
   tryLogin({ commit }) {
     try {
       const savedUser = JSON.parse(sessionStorage.getItem('auth:me'));
-    
+
       if (savedUser) {
         initDb(savedUser)
           .then(() => {
             commit('setMe', savedUser);
-            router.replace('/feed');
+            if (router.currentRoute.push !== '/feed') {
+              router.push('/feed');
+            }
           })
           .catch(console.error);
       }
@@ -154,28 +191,32 @@ const actions = {
     const { next } = obj;
     commit('delMe');
     orbitdb.shutdown();
-    router.replace(next);
+    if (router.currentRoute.path !== next) {
+      router.push(next);
+    }
   },
 
   create({ commit }, obj) {
     const { next, user } = obj;
 
     if (!user.username || !user.password) {
-      throw new Error('Invalid user object, must have username and password.');
+      throw new Error('Invalid user, must have username and password.');
     }
 
-    const key = passwordKey(user.password);
-    delete obj.password;
+    const auth = serializeUser(user);
+    commit('addUser', auth);
 
-    const nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
-    const auth = {
-      msg: b58.encode(nacl.secretbox(new Uint8Array(JSON.stringify(user)), nonce, key)),
-      nonce: b58.encode(nonce),
-    }
-
-    localStorage.setItem(`auth:${user.username}`, JSON.stringify(auth));
-    commit('setMe', obj);
-    router.replace(next);
+    initDb(user)
+      .then(() => {
+        commit('setMe', auth);
+        delete auth.identity;
+        localStorage.setItem(`auth:${user.username}`, JSON.stringify(auth));
+        router.replace(next);
+          if (router.currentRoute.push !== next) {
+          router.push(next);
+        }
+      })
+      .catch(console.error);
   }
 };
 
@@ -188,7 +229,27 @@ const mutations = {
   delMe(state) {
     sessionStorage.clear('auth:me');
     state.me = undefined;
-  }
+  },
+
+  loadUsers(state) {
+    let key;
+    const users = {};
+
+    for (let i = 0; (key = localStorage.key(i)); i++) {
+      if (!key.startsWith('auth:')) {
+        continue;
+      }
+
+      const username = key.substr(5);
+      users[username] = JSON.parse(localStorage.getItem(key));
+    }
+
+    state.users = users;
+  },
+
+  addUser(state, obj) {
+    state.users[obj.username] = obj;
+  },
 };
 
 
