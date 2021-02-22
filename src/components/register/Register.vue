@@ -65,14 +65,13 @@
                   :avatar="user.avatar"
                 />
                 <v-card-actions>
-                <ChooseAvatar
-                  v-model="user.avatar"
-                />
-                <ChooseIdentity
-                  v-model="user.identity"
-                />
+                  <ChooseAvatar
+                    v-model="user.avatar"
+                  />
+                  <ChooseIdentity
+                    v-model="user.identity"
+                  />
                 </v-card-actions>
-
               </v-card>
             </v-col>
           </v-row>

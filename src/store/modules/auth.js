@@ -43,6 +43,23 @@ async function initDb(user) {
   orbitdb.add('peers', await orbitdb.odb.docs('peers'));
   orbitdb.add('hashtags', await orbitdb.odb.keyvalue('hashtags'));
 
+  // Create an inbox that other users can write DMs to.
+  let inbox;
+  try {
+    inbox = await orbitdb.odb.create('inbox', 'feed', { accessController: ['*'] })
+  } catch(e) {
+    // If the error is that the database exists, open it.
+    if (e.message.indexOf('exists') === -1) {
+      throw e;
+    }
+    inbox = await orbitdb.odb.feed('inbox');
+  }
+  orbitdb.add('inbox', inbox);
+  inbox.events.on('replicated', () => {
+    console.log('Received a DM.');
+    // TODO: trigger a store action.
+  });
+
   // Collect node information for discovery.
   const nodeInfo = {
     username: user.username,
@@ -131,7 +148,7 @@ const actions = {
   logout({ commit }, obj) {
     const { next } = obj;
     commit('delMe');
-    // Net.shutdown();
+    orbitdb.shutdown();
     router.replace(next);
   },
 
