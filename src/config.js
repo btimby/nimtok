@@ -18,4 +18,6 @@ export default {
   },
   // Public, world writable, shared DB.
   HASHTAG_DB: '/orbitdb/zdpuB31k3fJdQL1xtnawF8VJWiKGeWo7Z41TqT5MMsaLYexDj/hashtags',
+  PATTERN_EMAIL: /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+  PATTERN_USERNAME: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/,
 };

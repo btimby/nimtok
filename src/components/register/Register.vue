@@ -12,24 +12,30 @@
       </v-btn>
     </template>
     <v-card>
-      <v-toolbar
-        color="primary"
+      <v-form
+        v-model="valid"
+        @submit.prevent="onRegister"
       >
-        <v-toolbar-title>Register</v-toolbar-title>
-      </v-toolbar>
-      <v-form>
+        <v-toolbar
+          color="primary"
+        >
+          <v-toolbar-title>Register</v-toolbar-title>
+        </v-toolbar>
         <v-container>
           <v-row>
             <v-col>
               <v-text-field
                 v-model="user.email"
+                :rules="rules.email"
                 label="email"
+                autofocus
                 required
               />
             </v-col>
             <v-col>
               <v-text-field
                 v-model="user.username"
+                :rules="rules.username"
                 label="username"
                 required
               />
@@ -39,6 +45,7 @@
             <v-col>
               <v-text-field
                 v-model="user.password"
+                :rules="rules.password"
                 label="password"
                 :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="show ? 'text' : 'password'"
@@ -75,19 +82,21 @@
             </v-col>
           </v-row>
         </v-container>
+        <v-card-actions>
+          <v-btn
+            :disabled="!valid"
+            type="submit"
+            @click.prevent="onRegister"
+          >
+            Register
+          </v-btn>
+          <v-btn
+            @click="dialog = false"
+          >
+            Cancel
+          </v-btn>
+        </v-card-actions>
       </v-form>
-      <v-card-actions>
-        <v-btn
-          @click.prevent="onRegister"
-        >
-          Register
-        </v-btn>
-        <v-btn
-          @click="dialog = false"
-        >
-          Cancel
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -96,6 +105,7 @@
 import ChooseAvatar from '@/components/register/ChooseAvatar';
 import ChooseIdentity from '@/components/register/ChooseIdentity';
 import User from '@/components/user/User';
+import config from '@/config';
 
 
 export default {
@@ -113,6 +123,7 @@ export default {
     return {
       show: false,
       dialog: false,
+      valid: true,
 
       user: {
         username: null,
@@ -124,7 +135,24 @@ export default {
           id: null,
         },
         bio: null,
-      }
+      },
+
+      rules: {
+        username: [
+          v => !!v || 'Username is required',
+          v => (v && 8 <= v.length <= 32) || 'User must be between 8 and 32 chars',
+        ],
+        email: [
+          v => !!v || 'Email is required',
+          v => config.PATTERN_EMAIL.test(v) || 'E-mail must be valid',
+        ],
+        password: [
+          v => !!v || 'Password is required',
+          v => (v && v.length <= 8) || 'Password must be at least 8 chars.',
+          v => config.PATTERN_USERNAME.test(v) || 'Password must contain at least lowercase letter, one number, a special character and one uppercase letter',
+        ],
+      },
+
     };
   },
 

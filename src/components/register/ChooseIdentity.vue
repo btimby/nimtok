@@ -2,8 +2,9 @@
   <v-btn
     small
     @click="roll"
+    title="Your identity cannot be changed."
   >
-    <v-icon>mdi-dice-5</v-icon>
+    <v-icon>mdi-dice-3-outline</v-icon>
     Identity
   </v-btn>
 </template>
