@@ -45,21 +45,35 @@
                 counter
                 @click:append="show = !show"
               />
+              <v-textarea
+                v-model="user.bio"
+                label="bio"
+              />
             </v-col>
             <v-col>
-              <v-container>
-                <v-row>
-                  <v-spacer/>
-                  <Avatar
-                    v-model="user.avatar"
-                  />
-                  <v-spacer/>
-                  <Identity
-                    v-model="user.identity"
-                  />
-                  <v-spacer/>
-                </v-row>
-              </v-container>
+              <v-card>
+                <v-list-item>
+                  <v-list-item-avatar color="gray"></v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title class="headline">How the world will see you.</v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+
+                <User
+                  :identity="user.identity"
+                  :username="user.username"
+                  :avatar="user.avatar"
+                />
+                <v-card-actions>
+                <ChooseAvatar
+                  v-model="user.avatar"
+                />
+                <ChooseIdentity
+                  v-model="user.identity"
+                />
+                </v-card-actions>
+
+              </v-card>
             </v-col>
           </v-row>
         </v-container>
@@ -81,14 +95,16 @@
 </template>
 
 <script>
-import Avatar from '@/components/Avatar';
-import Identity from '@/components/Identity';
+import ChooseAvatar from '@/components/register/ChooseAvatar';
+import ChooseIdentity from '@/components/register/ChooseIdentity';
+import User from '@/components/user/User';
 
 
 export default {
   components: {
-    Avatar,
-    Identity,
+    ChooseAvatar,
+    ChooseIdentity,
+    User,
   },
 
   props: {
@@ -109,6 +125,7 @@ export default {
         identity: {
           id: null,
         },
+        bio: null,
       }
     };
   },

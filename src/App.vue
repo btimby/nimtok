@@ -36,7 +36,7 @@
 <script>
 import Login from '@/components/Login';
 import Logout from '@/components/Logout';
-import Register from '@/components/Register';
+import Register from '@/components/register/Register';
 import Publish from '@/components/Publish';
 import Footer from '@/components/Footer';
 import { mapGetters } from 'vuex';
