@@ -3,10 +3,7 @@
     small
     @click="roll"
   >
-    <v-icon
-      small
-      left
-    >mdi-dice-5</v-icon>
+    <v-icon>mdi-dice-5</v-icon>
     Identity
   </v-btn>
 </template>

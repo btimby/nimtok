@@ -17,15 +17,7 @@ export default class VueOrbitDB {
     this.odb = null;
   }
 
-  static install() {
-    /*const version = Number(Vue.version.split('.')[0]);
-
-    if (version >= 3) {
-      Vue.config.globalProperties.$orbitdb = this;
-    } else {
-      Vue.prototype.$orbitdb = this;
-    }*/
-  }
+  static install() {}
 
   async connect({ IpfsOptions, }) {
     const options = {
@@ -55,6 +47,23 @@ export default class VueOrbitDB {
     }
 
     this.databases[name] = db;
+  }
+
+  // TODO: this should be implemented within orbitdb.
+  async addOrCreate(name, type, options) {
+    let db;
+
+    try {
+      db = await orbitdb.odb.create(name, type, options);
+    } catch(e) {
+      // If the error is that the database exists, open it.
+      if (e.message.indexOf('exists') === -1) {
+        throw e;
+      }
+      db = await orbitdb.odb.open(name);
+    }
+
+    this.add('inbox', db);
   }
 
   close(name) {

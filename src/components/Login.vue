@@ -7,8 +7,8 @@
         v-on="on"
         text
       >
-        <span class="mr-2">Login</span>
         <v-icon>mdi-login</v-icon>
+        <span class="mr-2">Login</span>
       </v-btn>
     </template>
     <v-card>

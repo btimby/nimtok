@@ -7,8 +7,8 @@
         v-on="on"
         text
       >
-        <span class="mr-2">Publish</span>
         <v-icon>mdi-note-plus</v-icon>
+        <span class="mr-2">Publish</span>
       </v-btn>
     </template>
     <v-card>

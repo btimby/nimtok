@@ -7,8 +7,8 @@
         v-on="on"
         text
       >
-        <span class="mr-2">Register</span>
         <v-icon>mdi-account-plus</v-icon>
+        <span class="mr-2">Register</span>
       </v-btn>
     </template>
     <v-card>
@@ -58,7 +58,6 @@
                     <v-list-item-title class="headline">How the world will see you.</v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
-
                 <User
                   :identity="user.identity"
                   :username="user.username"

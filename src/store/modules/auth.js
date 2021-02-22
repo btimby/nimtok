@@ -41,21 +41,13 @@ async function initDb(user) {
   orbitdb.add('posts', await orbitdb.odb.feed('posts'));
   orbitdb.add('following', await orbitdb.odb.docs('following'));
   orbitdb.add('peers', await orbitdb.odb.docs('peers'));
-  orbitdb.add('hashtags', await orbitdb.odb.keyvalue('hashtags'));
+  // Open global, world writable database.
+  orbitdb.add('hashtags', await orbitdb.odb.open(config.HASHTAG_DB));
+  // Create databases that other users can write to.
+  await orbitdb.addOrCreate('inbox', 'feed', { accessController: ['*'] });
+  await orbitdb.addOrCreate('followers', 'docs', { accessController: ['*'] });
 
-  // Create an inbox that other users can write DMs to.
-  let inbox;
-  try {
-    inbox = await orbitdb.odb.create('inbox', 'feed', { accessController: ['*'] })
-  } catch(e) {
-    // If the error is that the database exists, open it.
-    if (e.message.indexOf('exists') === -1) {
-      throw e;
-    }
-    inbox = await orbitdb.odb.feed('inbox');
-  }
-  orbitdb.add('inbox', inbox);
-  inbox.events.on('replicated', () => {
+  orbitdb.databases.inbox.events.on('replicated', () => {
     console.log('Received a DM.');
     // TODO: trigger a store action.
   });
@@ -64,6 +56,7 @@ async function initDb(user) {
   const nodeInfo = {
     username: user.username,
     profile: orbitdb.databases.profile.id,
+    inbox: orbitdb.databases.inbox.id,
     peers: orbitdb.databases.peers.id,
     posts: orbitdb.databases.posts.id,
   };

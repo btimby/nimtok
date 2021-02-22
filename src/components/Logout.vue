@@ -3,8 +3,8 @@
     @click="onLogout"
     text
   >
-    <span class="mr-2">Logout</span>
     <v-icon>mdi-logout</v-icon>
+    <span class="mr-2">Logout</span>
   </v-btn>
 </template>
 

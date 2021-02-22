@@ -9,7 +9,7 @@
           color="success"
           pill
         >
-          <v-icon left>mdi-lan-connect</v-icon>
+          <v-icon>mdi-lan-connect</v-icon>
           Users {{ peerCount + 1 | number('0a') }}
         </v-chip>
       </v-col>
