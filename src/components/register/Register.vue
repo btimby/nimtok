@@ -172,7 +172,7 @@ export default {
           delete auth.identity;
           localStorage.setItem(`auth:${auth.username}`, JSON.stringify(auth));
           this.dialog = false;
-          if (this.next && this.$router.currentRoute.push !== this.next) {
+          if (this.next && this.$route.push !== this.next) {
             this.$router.push(this.next);
           }
         })
