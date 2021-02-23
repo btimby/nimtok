@@ -39,9 +39,7 @@ export default {
       // TODO: this needs to generate a key pair for js-ipfs and use the public key for the identicon.
       // This key must then be used when connecting to the network.
       PeerId.create(config.PEER_KEY_OPTS).then((id) => {
-        const value = id.toJSON();
-        value.id = id.toHexString();
-        this.$emit('input', value);
+        this.$emit('input', id.toJSON());
       });
     },
   }

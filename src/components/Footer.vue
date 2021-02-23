@@ -7,10 +7,11 @@
         <v-chip
           class="ma-2"
           color="success"
+          :to="{path: '/feed', query: { tab: 'users' }}"
           pill
         >
           <v-icon>mdi-lan-connect</v-icon>
-          Users {{ peerCount + 1 | number('0a') }}
+          Users {{ userCount | number('0a') }}
         </v-chip>
       </v-col>
     </v-row>
@@ -24,7 +25,7 @@ import { mapGetters } from 'vuex';
 export default {
   computed: {
     ...mapGetters({
-      peerCount: 'peers/peerCount',
+      userCount: 'users/userCount',
       authenticated: 'auth/authenticated',
     }),
   },

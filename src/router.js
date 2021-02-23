@@ -17,6 +17,7 @@ const router = new VueRouter({
       path: '/feed',
       name: 'feed',
       component: Feed,
+      props: route => ({ selected: route.query.tab }),
     }
   ],
 });

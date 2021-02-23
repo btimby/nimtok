@@ -8,7 +8,7 @@
       />
       <span id="username">
         <Identity
-          :hash="identity.id"
+          :hash="id"
           :width="24"
           :height="24"
         />
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import Identity from '@/components/user/Identity';
 import Avatar from '@/components/user/Avatar';
 
@@ -32,18 +33,36 @@ export default {
   },
 
   props: {
-    avatar: String,
-    username: String,
-    identity: Object,
+    id: String,
 
     small: Boolean,
     large: Boolean,
   },
 
+  data() {
+    return {
+      avatar: null,
+      username: null,
+    };
+  },
+
   computed: {
     usernameOrDefault() {
       return this.username || "Username";
-    }
+    },
+  },
+
+  mounted() {
+    this
+      .getUser(this.id)
+      .then((user) => {
+        console.log(user);
+      })
+      .catch(console.error);
+  },
+
+  methods: {
+    ...mapActions({ getUser: 'users/getUser' }),
   }
 }
 </script>

@@ -11,23 +11,9 @@ const getters = {
 
 const actions = {
   /*create({ commit }, obj) {
-    return new Promise((resolve, reject) => {
-      Net.onready(async () => {
-        let hash;
+    // Broadcast hashtags.
 
-        try {
-          hash = await Net.addPost(obj);
-          console.log(`Added post: ${hash}`);
-          commit('addPost', obj);
-        } catch (e) {
-          reject(e);
-          return;
-        }
-
-        resolve(hash);
-      });
-    });
-  },*/
+  }*/
 };
 
 const mutations = {

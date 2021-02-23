@@ -24,4 +24,4 @@ new Vue({
 }).$mount('#app');
 
 store.dispatch('auth/tryLogin');
-store.commit('auth/loadUsers');
+store.dispatch('users/loadUsers');

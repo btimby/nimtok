@@ -29,7 +29,7 @@
                 v-model="index"
                 hide-delimiters
                 :show-arrows-on-hover="true"
-                :show-arrows="this.userNames.length > 1"
+                :show-arrows="this.users.size > 1"
                 light
                 height="140"
               >
@@ -108,14 +108,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ users: 'auth/users' }),
+    ...mapGetters({ users: 'users/users' }),
 
-    userNames() {
+    userIds() {
       return Object.keys(this.users);
     },
 
     user() {
-      return this.users[this.userNames[this.index]];
+      return this.users[this.userIds[this.index]];
     },
   },
 

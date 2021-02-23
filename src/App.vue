@@ -5,17 +5,13 @@
       color="primary"
       dark
     >
-      <div class="d-flex align-center">
-      </div>
-
       <v-spacer></v-spacer>
-
       <Login
-        v-if="!authenticated"
+        v-if="!authenticated && userCount"
         next="/feed"
       />
       <Logout
-        v-else
+        v-if="authenticated"
         next="/"
       />
       <Register
@@ -26,7 +22,7 @@
     <v-main>
       <v-container>
         <v-row>
-          <v-col offset="3" cols="6">
+          <v-col offset="2" cols="8">
             <router-view/>
           </v-col>
         </v-row>
@@ -56,15 +52,10 @@ export default {
 
   computed: {
     ...mapGetters({
+      userCount: 'users/userCount',
       authenticated: 'auth/authenticated',
       me: 'auth/me',
     }),
-  },
-
-  data: () => ({
-  }),
-
-  methods: {
   },
 };
 </script>

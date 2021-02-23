@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>What's on your mind?</v-card-title>
       <v-card-text>
-        <v-textarea
+        <Editor
           v-model="body"
         />
         <Hashtags
@@ -22,6 +22,7 @@
 
 <script>
 import Hashtags from '@/components/message/Hashtags';
+import Editor from '@/components/message/Editor';
 
 const PATTERN_HASHTAG = /(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g;
 const PATTERN_MENTION = /@(\w+)\b/g;
@@ -29,6 +30,7 @@ const PATTERN_MENTION = /@(\w+)\b/g;
 export default {
   components: {
     Hashtags,
+    Editor,
   },
 
   data() {

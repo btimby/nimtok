@@ -10,25 +10,82 @@ const IPFSOPTIONS = {
 }
 
 
-export default class VueOrbitDB {
-  constructor({ store }) {
+class VueOrbitStore {
+  constructor({ name, type, address, options, load, beforeOpen, afterOpen, beforeLoad, afterLoad, }) {
+    this.name = name;
+    this.address = address;
+    this.type = type;
+    this.options = options;
+    this.load = load;
+    this.hooks = {
+      beforeOpen,
+      afterOpen,
+      beforeLoad,
+      afterLoad,
+    };
+    this.db = null;
+  }
+
+  get id() {
+    return this._store.id;
+  }
+
+  async open(db) {
+    this.db = db;
+    this.hooks.beforeOpen && this.hooks.beforeOpen();
+    if (this.name) {
+      this._store = await this.db.openOrCreate(this.name, this.type, this.options);
+    } else if (this.address) {
+      this._store = await this.db.odb.open(this.address, this.type);
+    } else {
+      throw new Error('Cannot open database, no name or address!');
+    }
+    this.hooks.afterOpen && this.hooks.afterOpen(this._store);
+    // Hook can return false to abort load.
+    if (this.load || this.hooks.afterLoad && (
+      !this.hooks.beforeLoad || this.hooks.beforeLoad() !== false
+    )) {
+      this._store
+        .load()
+        .then(() => {
+          this.hooks.afterLoad && this.hooks.afterLoad(this._store);
+        })
+        .catch(console.error);
+    }
+  }
+}
+
+class VueOrbitDB {
+  constructor({ store, databases, options, beforeConnect, afterConnect, }) {
     this._store = store;
     this._actions = new Map();
     this.node = null;
     this.odb = null;
+    this.databases = databases;
+    this.options = options;
+    this.hooks = {
+      beforeConnect,
+      afterConnect,
+    };
   }
 
   static install() {}
 
-  async connect({ IpfsOptions, }) {
-    const options = {
+  async connect(options) {
+    this.hooks.beforeConnect && this.hooks.beforeConnect(this);
+    this.node = await Ipfs.create({
       ...IPFSOPTIONS,
-      ...IpfsOptions,
-    }
-    this.node = await Ipfs.create(options);
+      ...this.options,
+      ...options,
+    });
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
-    this.databases = {};
+    for (let key in this.databases) {
+      const db = this.databases[key];
+      await db.open(this);
+    }
+    window.$orbitdb = this;
+    this.hooks.afterConnect && this.hooks.afterConnect(this);
   }
 
   async shutdown() {
@@ -40,14 +97,6 @@ export default class VueOrbitDB {
     this.node.stop();
     this.node = this.odb = this.id = null;
     this.databases = {};
-  }
-
-  add(name, db) {
-    if (!this.node) {
-      throw new Error('OrbitDB not connected.');
-    }
-
-    this.databases[name] = db;
   }
 
   // TODO: this should be implemented within orbitdb.
@@ -68,20 +117,7 @@ export default class VueOrbitDB {
       db = await this.odb.open(address, type);
     }
 
-    this.add(name, db);
-  }
-
-  close(name) {
-    if (!this.node) {
-      throw new Error('OrbitDB not connected.');
-    }
-
-    this.databases[name]
-      .close()
-      .then(() => {
-        delete this.databases[name];
-      })
-      .catch(console.error);
+    return db;
   }
 
   _dispatch(message) {
@@ -142,3 +178,9 @@ export default class VueOrbitDB {
     await this.node.pubsub.publish(topic, data);
   }
 }
+
+
+export {
+  VueOrbitStore,
+  VueOrbitDB,
+};

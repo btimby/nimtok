@@ -2,9 +2,12 @@ import nacl from 'tweetnacl';
 import b58 from 'b58';
 import router from '@/router';
 import orbitdb from '@/orbitdb';
-import config from '@/config';
 import { str2arr, arr2str } from '@/utils';
 
+
+const state = {
+  me: null,
+};
 
 function passwordKey(password) {
   // 64 byte hash:
@@ -49,82 +52,6 @@ function deserializeUser(obj, password) {
   return user;
 }
 
-async function initDb(user) {
-  const IpfsOptions = {
-    repo: user.username,
-    privateKey: user.identity.privKey,
-    relay: {
-      enabled: true,
-      hop: {
-        enabled: true,
-        active: true,
-      },
-    },
-    config: {
-      Addresses: {
-        Swarm: [
-          config.SWARM_ADDR,
-        ],
-      },
-    },
-  };
-
-  await orbitdb.connect({ IpfsOptions });
-
-  // Open our databases here.
-  orbitdb.add('profile', await orbitdb.odb.keyvalue('profile'));
-  // Our posts go here.
-  orbitdb.add('posts', await orbitdb.odb.feed('posts'));
-  // Whom we follow.
-  orbitdb.add('following', await orbitdb.odb.docs('following'));
-  // discovered peers.
-  orbitdb.add('peers', await orbitdb.odb.docs('peers'));
-  // Open global, world writable database.
-  orbitdb.add('hashtags', await orbitdb.odb.open(config.HASHTAG_DB, 'keyvalue'));
-  // Inbox for direct messages.
-  await orbitdb.openOrCreate('inbox', 'feed', {
-    accessController: {
-      write: ['*'],
-    },
-  });
-  // Other users can write to this database to follow us.
-  await orbitdb.openOrCreate('followers', 'docstore', {
-    accessController: {
-      write: ['*'],
-    },
-   });
-
-  orbitdb.databases.inbox.events.on('replicated', () => {
-    console.log('Received a DM.');
-    // TODO: trigger a store action.
-  });
-
-  // Collect node information for discovery.
-  const nodeInfo = {
-    username: user.username,
-    profile: orbitdb.databases.profile.id,
-    inbox: orbitdb.databases.inbox.id,
-    peers: orbitdb.databases.peers.id,
-    posts: orbitdb.databases.posts.id,
-  };
-  
-  // Set up pubsub.
-  orbitdb.subscribe('discovery', 'peers/discovery');
-  orbitdb.subscribe('discovery', ({ message }) => {
-    orbitdb.publish(message.from, nodeInfo);
-  });
-  orbitdb.subscribe(orbitdb.id.id, 'peers/discovery');
-
-  setTimeout(() => {
-    orbitdb.publish('discovery', nodeInfo);
-  }, 2000);
-}
-
-const state = {
-  me: null,
-  users: {},
-};
-
 const getters = {
   me: state => {
     return state.me;
@@ -132,10 +59,6 @@ const getters = {
 
   authenticated: state => {
     return Boolean(state.me);
-  },
-
-  users: state => {
-    return state.users;
   },
 };
 
@@ -154,13 +77,17 @@ const actions = {
       throw new Error('Invalid username or password');
     }
 
-    initDb(user)
+    orbitdb
+      .connect({
+        repo: user.username,
+        privateKey: user.identity.privKey,
+      })
       .then(() => {
         // Don't store sensitive fields in session.
         delete user.nonce;
         delete user.secret;
         commit('setMe', user);
-        if (router.currentRoute.path !== next) {
+        if (next && router.currentRoute.path !== next) {
           router.push(next);
         }
       })
@@ -169,12 +96,16 @@ const actions = {
 
   tryLogin({ commit }) {
     try {
-      const savedUser = JSON.parse(sessionStorage.getItem('auth:me'));
+      const user = JSON.parse(sessionStorage.getItem('auth:me'));
 
-      if (savedUser) {
-        initDb(savedUser)
+      if (user) {
+        orbitdb
+          .connect({
+            repo: user.username,
+            privateKey: user.identity.privKey,
+          })
           .then(() => {
-            commit('setMe', savedUser);
+            commit('setMe', user);
             if (router.currentRoute.push !== '/feed') {
               router.push('/feed');
             }
@@ -188,10 +119,11 @@ const actions = {
   },
 
   logout({ commit }, obj) {
-    const { next } = obj;
     commit('delMe');
     orbitdb.shutdown();
-    if (router.currentRoute.path !== next) {
+
+    const { next } = obj;
+    if (next && router.currentRoute.path !== next) {
       router.push(next);
     }
   },
@@ -204,15 +136,17 @@ const actions = {
     }
 
     const auth = serializeUser(user);
-    commit('addUser', auth);
 
-    initDb(user)
+    orbitdb.connect({
+        repo: user.username,
+        privateKey: user.identity.privKey,
+      })
       .then(() => {
         commit('setMe', auth);
         delete auth.identity;
         localStorage.setItem(`auth:${user.username}`, JSON.stringify(auth));
         router.replace(next);
-          if (router.currentRoute.push !== next) {
+          if (next && router.currentRoute.push !== next) {
           router.push(next);
         }
       })
@@ -229,26 +163,6 @@ const mutations = {
   delMe(state) {
     sessionStorage.clear('auth:me');
     state.me = undefined;
-  },
-
-  loadUsers(state) {
-    let key;
-    const users = {};
-
-    for (let i = 0; (key = localStorage.key(i)); i++) {
-      if (!key.startsWith('auth:')) {
-        continue;
-      }
-
-      const username = key.substr(5);
-      users[username] = JSON.parse(localStorage.getItem(key));
-    }
-
-    state.users = users;
-  },
-
-  addUser(state, obj) {
-    state.users[obj.username] = obj;
   },
 };
 
