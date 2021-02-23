@@ -81,25 +81,26 @@ const actions = {
       }
     }
 
+    // TODO: move this to orbitdb.js, into the mutation subscription (auth/setMe).
     return new Promise((resolve, reject) => {
       orbitdb
-      .connect({
-        options: {
-          repo: user.username,
-          privateKey: user.identity.privKey,
-        },
-        meta: {
-          user,
-        }
-      })
-      .then(() => {
-        // Don't store sensitive fields in session.
-        delete user.nonce;
-        delete user.secret;
-        commit('setMe', user);
-        resolve(user);
-      })
-      .catch(reject);
+        .connect({
+          options: {
+            repo: user.username,
+            privateKey: user.identity.privKey,
+          },
+          meta: {
+            user,
+          }
+        })
+        .then(() => {
+          // Don't store sensitive fields in session.
+          delete user.nonce;
+          delete user.secret;
+          commit('setMe', user);
+          resolve(user);
+        })
+        .catch(reject);
     });
   },
 
