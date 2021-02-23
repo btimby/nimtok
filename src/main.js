@@ -23,6 +23,3 @@ new Vue({
   orbitdb,
   render: h => h(App),
 }).$mount('#app');
-
-// TODO: eventually remove this.
-store.dispatch('auth/tryLogin');
