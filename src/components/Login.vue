@@ -28,12 +28,14 @@
               <v-carousel
                 v-model="index"
                 hide-delimiters
-                :show-arrows-on-hover="true"
-                :show-arrows="this.users.size > 1"
+                :show-arrows="users.length > 1"
                 light
                 height="140"
               >
-                <v-carousel-item>
+                <v-carousel-item
+                  v-for="(user, i) in users"
+                  :key="i"
+                >
                   <v-sheet
                     height="100%"
                     tile
