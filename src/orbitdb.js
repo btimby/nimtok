@@ -22,12 +22,10 @@ const peers = new VueOrbitStore('peers', 'docstore', {
       // Transform the object somewhat.
       const peer = { ...peerList[i] };
       peer.id = peer._id;
+      peer._srcOrbitDB = true;
       delete peer._id;
 
-      store.commit('users/addUser', {
-        id: peer.id,
-        ...peer,
-      });
+      store.commit('users/addUser', peer);
     }
   }
 });
@@ -141,6 +139,11 @@ function addUser(user) {
 // NOTE: Sync orbitdb with vuex.
 store.subscribe((mutation, state) => {
   debug('store:subscribe(%O, %O)', mutation, state);
+
+  if (mutation.payload._srcOrbitDB) {
+    debug('Skipping circular %s mutation', mutation.type);
+    return;
+  }
 
   switch (mutation.type) {
     case 'users/addUser':
