@@ -106,8 +106,16 @@ const actions = {
   logout({ commit }, obj) {
     debug('actions.logout(%O)', obj);
 
-    commit('delMe');
-    orbitdb.shutdown();
+    return new Promise((resolve, reject) => {
+      try {
+        commit('delMe');
+        orbitdb.shutdown();
+      } catch (e) {
+        reject(e);
+        return;
+      }
+      resolve();
+    });
   },
 
   create({ commit }, obj) {
