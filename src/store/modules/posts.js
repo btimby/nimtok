@@ -1,4 +1,7 @@
+import Debug from 'debug';
 
+
+const debug = Debug('nimtok:store:posts');
 const state = {
   posts: [],
 };
@@ -18,6 +21,8 @@ const actions = {
 
 const mutations = {
   addPost(state, obj) {
+    debug('mutations.addPost(%O)', obj);
+
     state.posts.push(obj);
   },
 };

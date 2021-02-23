@@ -10,7 +10,8 @@ Vue.config.productionTip = false
 // TODO: remove logging...
 // window.LOG = 'orbit*'; 
 // localStorage.setItem('debug', 'ipfs:*');
-localStorage.removeItem('debug');
+localStorage.setItem('debug', 'nimtok:*');
+// localStorage.removeItem('debug');
 
 Vue.use(Vue2Filters);
 
@@ -23,5 +24,5 @@ new Vue({
   render: h => h(App),
 }).$mount('#app');
 
+// TODO: eventually remove this.
 store.dispatch('auth/tryLogin');
-store.dispatch('users/loadUsers');

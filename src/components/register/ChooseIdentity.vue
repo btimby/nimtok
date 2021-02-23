@@ -28,12 +28,6 @@ export default {
     this.roll();
   },
 
-  computed: {
-    hash() {
-      return this.value.id;
-    }
-  },
-
   methods: {
     roll() {
       // TODO: this needs to generate a key pair for js-ipfs and use the public key for the identicon.

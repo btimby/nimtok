@@ -1,6 +1,6 @@
 <template>
   <img
-    :src="`data:image/png;base64,${identicon}`"
+    :src="identicon"
     :title="title"
     :width="width"
     :height="height"
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import mh from 'multihashes';
+import b58 from 'b58';
 import Identicon from 'identicon.js';
 import config from '@/config';
 
@@ -27,15 +29,21 @@ export default {
   },
 
   computed: {
+    hex() {
+      return mh.toHexString(b58.decode(this.hash));
+    },
+
     identicon() {
       if (!this.hash) {
         return;
       }
 
-      return new Identicon(this.hash, {
+      const base64 = new Identicon(this.hex, {
         size: config.IDENTICON.WIDTH,
         background: [0, 0, 0, 0],
       }).toString();
+
+      return `data:image/png;base64,${base64}`;
     },
   },
 }

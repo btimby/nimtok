@@ -1,10 +1,10 @@
 import nacl from 'tweetnacl';
 import b58 from 'b58';
-import router from '@/router';
+import Debug from 'debug';
 import orbitdb from '@/orbitdb';
 import { str2arr, arr2str } from '@/utils';
 
-
+const debug = Debug('nimtok:store:auth');
 const state = {
   me: null,
 };
@@ -64,104 +64,118 @@ const getters = {
 
 const actions = {
   login({ commit }, obj) {
-    const { next, username, password } = obj;
+    debug('actions.login(%O)', obj);
 
-    const auth = JSON.parse(localStorage.getItem(`auth:${username}`));
-    if (!auth) {
-      throw new Error('Invalid username or password');
+    let { user, username, password } = obj;
+
+    if (!user) {
+      const auth = JSON.parse(localStorage.getItem(`auth:${username}`));
+      if (!auth) {
+        throw new Error('Invalid username or password');
+      }
+  
+      user = deserializeUser(auth, password);
+  
+      if (user === null) {
+        throw new Error('Invalid username or password');
+      }
     }
 
-    const user = deserializeUser(auth, password);
-
-    if (user === null) {
-      throw new Error('Invalid username or password');
-    }
-
-    orbitdb
+    return new Promise((resolve, reject) => {
+      orbitdb
       .connect({
-        repo: user.username,
-        privateKey: user.identity.privKey,
+        options: {
+          repo: user.username,
+          privateKey: user.identity.privKey,
+        },
+        meta: {
+          user,
+        }
       })
       .then(() => {
         // Don't store sensitive fields in session.
         delete user.nonce;
         delete user.secret;
         commit('setMe', user);
-        if (next && router.currentRoute.path !== next) {
-          router.push(next);
-        }
+        resolve(user);
       })
-      .catch(console.error);
-  },
-
-  tryLogin({ commit }) {
-    try {
-      const user = JSON.parse(sessionStorage.getItem('auth:me'));
-
-      if (user) {
-        orbitdb
-          .connect({
-            repo: user.username,
-            privateKey: user.identity.privKey,
-          })
-          .then(() => {
-            commit('setMe', user);
-            if (router.currentRoute.push !== '/feed') {
-              router.push('/feed');
-            }
-          })
-          .catch(console.error);
-      }
-    } catch (e) {
-      console.error(e);
-      console.warn('User not present in sessionStorage');
-    }    
+      .catch(reject);
+    });
   },
 
   logout({ commit }, obj) {
+    debug('actions.logout(%O)', obj);
+
     commit('delMe');
     orbitdb.shutdown();
-
-    const { next } = obj;
-    if (next && router.currentRoute.path !== next) {
-      router.push(next);
-    }
   },
 
   create({ commit }, obj) {
-    const { next, user } = obj;
+    debug('actions.create(%O)', obj);
 
-    if (!user.username || !user.password) {
-      throw new Error('Invalid user, must have username and password.');
-    }
+    const { user } = obj;
 
-    const auth = serializeUser(user);
+    return new Promise((resolve, reject) => {
+      if (!user.username || !user.password) {
+        throw new Error('Invalid user, must have username and password.');
+      }
+  
+      const auth = serializeUser(user);
+  
+      orbitdb.connect({
+          options: {
+            repo: user.username,
+            privateKey: user.identity.privKey,
+          },
+          meta: {
+            user,
+          },
+        })
+        .then(() => {
+          // Upload avatar image to ipfs.
+          const avatar = user.avatar.split(',')[1];
+          const prom1 = orbitdb.node.add(atob(avatar));
+          // Open the profile database for writing.
+          const prom2 = new Promise((resolve, reject) => {
+            try {
+              const profile = orbitdb.databases.profile;
+              profile.db.events.on('ready', () => {
+                resolve(profile);
+              });
+              profile.db.load();
+            } catch (e) {
+              reject(e);
+            }
+          });
 
-    orbitdb.connect({
-        repo: user.username,
-        privateKey: user.identity.privKey,
-      })
-      .then(() => {
-        commit('setMe', auth);
-        delete auth.identity;
-        localStorage.setItem(`auth:${user.username}`, JSON.stringify(auth));
-        router.replace(next);
-          if (next && router.currentRoute.push !== next) {
-          router.push(next);
-        }
-      })
-      .catch(console.error);
+          Promise
+            .all([prom1, prom2])
+            .then(([avatar, profile]) => {
+              profile.db.set('avatar', avatar.path);
+              profile.db.set('bio', user.bio);
+              auth.profile = profile.db.id;
+
+              // Save user to session (for persistent login).
+              commit('setMe', auth);
+              resolve(auth);
+            })
+            .catch(reject);
+        })
+        .catch(reject);
+    });
   }
 };
 
 const mutations = {
   setMe(state, obj) {
-    sessionStorage.setItem('auth:me', JSON.stringify(obj));
+    debug('mutations.setMe(%O)', obj);
+
     state.me = obj;
   },
 
   delMe(state) {
-    sessionStorage.clear('auth:me');
+    debug('mutations.delMe()');
+
     state.me = undefined;
   },
 };

@@ -26,7 +26,7 @@
           <v-row>
             <v-col>
               <v-text-field
-                v-model="user.email"
+                v-model="form.email"
                 :rules="rules.email"
                 label="email"
                 autofocus
@@ -35,7 +35,7 @@
             </v-col>
             <v-col>
               <v-text-field
-                v-model="user.username"
+                v-model="form.username"
                 :rules="rules.username"
                 label="username"
                 counter
@@ -46,7 +46,7 @@
           <v-row>
             <v-col>
               <v-text-field
-                v-model="user.password"
+                v-model="form.password"
                 :rules="rules.password"
                 label="password"
                 :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
@@ -55,7 +55,7 @@
                 @click:append="show = !show"
               />
               <v-textarea
-                v-model="user.bio"
+                v-model="form.bio"
                 label="bio"
               />
             </v-col>
@@ -68,16 +68,16 @@
                   </v-list-item-content>
                 </v-list-item>
                 <User
-                  :identity="user.identity"
-                  :username="user.username"
-                  :avatar="user.avatar"
+                  :identity="form.identity"
+                  :username="form.username"
+                  :avatar="form.avatar"
                 />
                 <v-card-actions>
                   <ChooseAvatar
-                    v-model="user.avatar"
+                    v-model="form.avatar"
                   />
                   <ChooseIdentity
-                    v-model="user.identity"
+                    v-model="form.identity"
                   />
                 </v-card-actions>
               </v-card>
@@ -122,7 +122,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters({users: 'auth/users'}),
+    ...mapGetters({users: 'users/users'}),
   },
 
   data() {
@@ -131,7 +131,7 @@ export default {
       dialog: false,
       valid: true,
 
-      user: {
+      form: {
         username: null,
         email: null,
         password: null,
@@ -142,7 +142,7 @@ export default {
 
       rules: {
         username: [
-          v => !this.users[v] || 'Username already used',
+          v => this.users && !this.users[v] || 'Username already used',
           v => !!v || 'Username is required',
           v => (v && v.length >= config.USERNAME.MIN_LENGTH && v.length <= config.USERNAME.MAX_LENGTH) || 'User must be between 8 and 32 chars',
           v => config.PATTERN_USERNAME.test(v) || 'Username contains invalid chars.',
@@ -163,11 +163,20 @@ export default {
 
   methods: {
     onRegister() {
-      this.$store.dispatch('auth/create', {
-        next: this.next,
-        user: this.user,
-      });
-      this.dialog = false;
+      this.$store
+        .dispatch('auth/create', {
+          user: this.form,
+        })
+        .then((auth) => {
+          // Save user to localstorage (for Login).
+          delete auth.identity;
+          localStorage.setItem(`auth:${auth.username}`, JSON.stringify(auth));
+          this.dialog = false;
+          if (this.next && this.$router.currentRoute.push !== this.next) {
+            this.$router.push(this.next);
+          }
+        })
+        .catch(console.error);
     },
   },
 }

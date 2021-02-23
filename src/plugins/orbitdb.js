@@ -11,44 +11,41 @@ const IPFSOPTIONS = {
 
 
 class VueOrbitStore {
-  constructor({ name, type, address, options, load, beforeOpen, afterOpen, beforeLoad, afterLoad, }) {
+  constructor(name, type, options) {
     this.name = name;
-    this.address = address;
     this.type = type;
-    this.options = options;
-    this.load = load;
+    this.address = options && options.address;
+    this.openOptions = options && options.openOptions;
+    this.load = options && options.load;
     this.hooks = {
-      beforeOpen,
-      afterOpen,
-      beforeLoad,
-      afterLoad,
+      beforeOpen: options && options.beforeOpen,
+      afterOpen: options && options.afterOpen,
+      beforeLoad: options && options.beforeLoad,
+      afterLoad: options && options.afterLoad,
     };
+    this.cn = null;
     this.db = null;
   }
 
-  get id() {
-    return this._store.id;
-  }
-
-  async open(db) {
-    this.db = db;
+  async open(connection) {
+    this.cn = connection;
     this.hooks.beforeOpen && this.hooks.beforeOpen();
-    if (this.name) {
-      this._store = await this.db.openOrCreate(this.name, this.type, this.options);
-    } else if (this.address) {
-      this._store = await this.db.odb.open(this.address, this.type);
+    if (this.address) {
+      this.db = await this.cn.odb.open(this.address, this.type);
+    } else if (this.name) {
+      this.db = await this.cn.openOrCreate(this.name, this.type, this.createOptions);
     } else {
       throw new Error('Cannot open database, no name or address!');
     }
-    this.hooks.afterOpen && this.hooks.afterOpen(this._store);
+    this.hooks.afterOpen && this.hooks.afterOpen();
     // Hook can return false to abort load.
     if (this.load || this.hooks.afterLoad && (
       !this.hooks.beforeLoad || this.hooks.beforeLoad() !== false
     )) {
-      this._store
+      this.db
         .load()
         .then(() => {
-          this.hooks.afterLoad && this.hooks.afterLoad(this._store);
+          this.hooks.afterLoad && this.hooks.afterLoad();
         })
         .catch(console.error);
     }
@@ -71,13 +68,14 @@ class VueOrbitDB {
 
   static install() {}
 
-  async connect(options) {
-    this.hooks.beforeConnect && this.hooks.beforeConnect(this);
+  async connect({ options, meta }) {
+    this.hooks.beforeConnect && this.hooks.beforeConnect();
     this.node = await Ipfs.create({
       ...IPFSOPTIONS,
       ...this.options,
       ...options,
     });
+    this.meta = meta;
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
     for (let key in this.databases) {
@@ -85,7 +83,7 @@ class VueOrbitDB {
       await db.open(this);
     }
     window.$orbitdb = this;
-    this.hooks.afterConnect && this.hooks.afterConnect(this);
+    this.hooks.afterConnect && this.hooks.afterConnect();
   }
 
   async shutdown() {

@@ -7,7 +7,7 @@
     >
       <v-spacer></v-spacer>
       <Login
-        v-if="!authenticated && userCount"
+        v-if="!authenticated"
         next="/feed"
       />
       <Logout
@@ -52,7 +52,6 @@ export default {
 
   computed: {
     ...mapGetters({
-      userCount: 'users/userCount',
       authenticated: 'auth/authenticated',
       me: 'auth/me',
     }),

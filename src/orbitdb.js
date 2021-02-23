@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import Debug from 'debug';
 import { VueOrbitStore, VueOrbitDB } from '@/plugins/orbitdb';
 import store from '@/store';
 import config from '@/config';
@@ -6,55 +7,20 @@ import config from '@/config';
 Vue.use(VueOrbitDB);
 
 
-const profile = new VueOrbitStore({
-  name: 'profile',
-  type: 'keyvalue',
-  beforeOpen() {
-    console.log('profile.beforeOpen()');
-  },
-  afterOpen() {
-    console.log('profile.afterOpen()');
-  },
-});
+const debug = Debug('nimtok:orbitdb');
+const profile = new VueOrbitStore('profile', 'keyvalue');
+const posts = new VueOrbitStore('posts', 'feed');
+const following = new VueOrbitStore('following', 'docstore');
 
-const posts = new VueOrbitStore({
-  name: 'posts',
-  type: 'feed',
-  beforeOpen() {
-    console.log('posts.beforeOpen()');
-  },
-  afterOpen() {
-    console.log('posts.afterOpen()');
-  },
-});
+const peers = new VueOrbitStore('peers', 'docstore', {
+  afterLoad() {
+    debug('peers:afterLoad');
 
-const following = new VueOrbitStore({
-  name: 'following',
-  type: 'docstore',
-  beforeOpen() {
-    console.log('following.beforeOpen()');
-  },
-  afterOpen() {
-    console.log('following.afterOpen()');
-  },
-});
+    const peerList = peers.db.query(() => true);
 
-const peers = new VueOrbitStore({
-  name: 'peers',
-  type: 'docstore',
-  beforeOpen() {
-    console.log('peers.beforeOpen()');
-  },
-  afterOpen() {
-    console.log('peers.afterOpen()');
-  },
-  afterLoad(db) {
-    console.log('peers.afterLoad()');
-    const peers = db.query(() => true);
-  
-    for (let i in peers) {
+    for (let i in peerList) {
       // Transform the object somewhat.
-      const peer = { ...peers[i] };
+      const peer = { ...peerList[i] };
       peer.id = peer._id;
       delete peer._id;
 
@@ -66,49 +32,30 @@ const peers = new VueOrbitStore({
   }
 });
 
-const hashtags = new VueOrbitStore({
+const hashtags = new VueOrbitStore('hashtags', 'keyvalue', {
   address: config.HASHTAG_DB,
-  type: 'keyvalue',
-  beforeOpen() {
-    console.log('hashtags.beforeOpen()');
-  },
-  afterOpen() {
-    console.log('hashtags.afterOpen()');
-  },
 });
 
-const inbox = new VueOrbitStore({
-  name: 'inbox',
-  type: 'feed',
-  options: {
+const inbox = new VueOrbitStore('inbox', 'feed', {
+  createOptions: {
     accessController: {
       write: ['*'],
     },
   },
-  beforeOpen() {
-    console.log('inbox.beforeOpen()');
-  },
-  afterOpen(db) {
-    console.log('inbox.afterOpen()');
-    db.events.on('replicated', () => {
-      console.log('inbox:replicated');
+  afterOpen() {
+    debug('inbox:afterOpen');
+
+    inbox.db.events.on('replicated', () => {
+      debug('inbox:replicated');
     });
   },
 });
 
-const followers = new VueOrbitStore({
-  name: 'followers',
-  type: 'docstore',
-  options: {
+const followers = new VueOrbitStore('followers', 'docstore', {
+  createOptions: {
     accessController: {
       write: ['*'],
     },
-  },
-  beforeOpen() {
-    console.log('followers.beforeOpen()');
-  },
-  afterOpen() {
-    console.log('followers.afterOpen()');
   },
 });
 
@@ -139,38 +86,71 @@ const orbitdb = new VueOrbitDB({
       },
     },
   },
-  afterConnect(db) {
+  afterConnect() {
+    debug('connection:afterConnect');
+
     // Collect node information for discovery.
+    profile.db.set('inbox', inbox.db.id);
+    profile.db.set('peers', peers.db.id);
+    profile.db.set('posts', posts.db.id);
+    profile.db.set('following', following.db.id);
+    profile.db.set('followers', followers.db.id);
+
     const nodeInfo = {
       type: 'discovery',
-      data: {
-        //username: user.username,
-        profile: db.databases.profile.id,
-        inbox: db.databases.inbox.id,
-        peers: db.databases.peers.id,
-        posts: db.databases.posts.id,
-        following: db.databases.following.id,
-        followers: db.databases.followers.id,
-      }
+      username: orbitdb.meta.user.username,
+      profile: profile.db.id,
     };
 
     // Set up pubsub.
-    db.subscribe('discovery', 'users/discovery');
-    db.subscribe('discovery', ({ message }) => {
-      db.publish(message.from, nodeInfo);
+    orbitdb.subscribe('discovery', 'users/discovery');
+    orbitdb.subscribe('discovery', (obj) => {
+      debug('pubsub.discovery(%O)', obj);
+
+      orbitdb.publish(obj.message.from, nodeInfo);
     });
-    // TODO: other message types may appear here.
-    db.subscribe(db.id.id, (obj) => {
+    orbitdb.subscribe(orbitdb.id.id, (obj) => {
+      debug(`pubsub.${orbitdb.id.id}(%O)`, obj);
+
       if (obj.data.type === 'discovery') {
         store.dispatch('users/discovery', obj);
       }
     });
 
     setTimeout(() => {
-      db.publish('discovery', nodeInfo);
+      debug('pubsub.discovery()', nodeInfo);
+
+      orbitdb.publish('discovery', nodeInfo);
     }, 10000);  
   },
 });
 
+
+function addUser(user) {
+  debug('addUser(%O)', user);
+
+  peers.db
+    .put({
+      _id: user.id,
+      username: user.username,
+      profile: user.profile,
+    })
+    .catch(console.error);
+}
+
+// NOTE: Sync orbitdb with vuex.
+store.subscribe((mutation, state) => {
+  debug('store:subscribe(%O, %O)', mutation, state);
+
+  switch (mutation.type) {
+    case 'users/addUser':
+        addUser(mutation.payload);
+      break;
+  
+    default:
+      debug('Unhandled mutation type: %s', mutation.type);
+      break;
+  }
+})
 
 export default orbitdb;

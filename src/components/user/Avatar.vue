@@ -1,6 +1,6 @@
 <template>
   <img
-      :src="url"
+      :src="src"
       :width="width"
       :height="height"
   />
@@ -12,8 +12,8 @@ import config from '@/config';
 
 export default {
   props: {
-    src: String,
-    cid: String,
+    value: String,
+
     width: {
       type: Number,
       default: config.AVATAR.WIDTH,
@@ -22,13 +22,15 @@ export default {
       type: Number,
       default: config.AVATAR.HEIGHT,
     },
-  },    
-
+  },
+  
   computed: {
-    url() {
-      // TODO: support ipfs CID.
-      return this.src;
-    }
+    src() {
+      if (this.value) {
+        return this.value;
+      }
+      return null;
+    },
   },
 }
 </script>

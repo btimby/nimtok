@@ -16,7 +16,15 @@ export default {
 
   methods: {
     onLogout() {
-      this.$store.dispatch('auth/logout', { next: this.next });
+      this.$store
+        .dispatch('auth/logout', { next: this.next })
+        .then(() => {
+          sessionStorage.clear('auth:me');
+          if (this.next && this.$router.currentRoute.path !== this.next) {
+            this.$router.push(this.next);
+          }
+        })
+        .catch(console.error);
     }
   }
 }

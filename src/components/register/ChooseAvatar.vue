@@ -58,7 +58,8 @@ function urlToDataUrl(url) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(image, 0, 0);
 
-        resolve(canvas.toDataURL('image/png'));
+        const data = canvas.toDataURL('image/png');
+        resolve(data);
       } catch (e) {
         reject(e);
       }
@@ -72,6 +73,7 @@ export default {
   },
 
   props: {
+    value: String,
     width: {
       type: Number,
       default: config.AVATAR.WIDTH,

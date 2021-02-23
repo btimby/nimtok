@@ -4,11 +4,11 @@
   >
     <v-row id="chosen">
       <Avatar
-        :src="avatar"
+        :value="user.avatar"
       />
       <span id="username">
         <Identity
-          :hash="id"
+          :hash="user.identity.id"
           :width="24"
           :height="24"
         />
@@ -34,29 +34,42 @@ export default {
 
   props: {
     id: String,
+    identity: Object,
+    avatar: String,
+    username: String,
 
     small: Boolean,
     large: Boolean,
-  },
-
-  data() {
-    return {
-      avatar: null,
-      username: null,
-    };
   },
 
   computed: {
     usernameOrDefault() {
       return this.username || "Username";
     },
+
+    user() {
+      return {
+        avatar: this.avatar,
+        username: this.username,
+        identity: this.identity,
+      };
+    },
   },
 
   mounted() {
+    if (!this.id) {
+      return;
+    }
+
     this
       .getUser(this.id)
       .then((user) => {
-        console.log(user);
+        this.user = {
+          ...user,
+          identity: {
+            id: this.id,
+          },
+        };
       })
       .catch(console.error);
   },

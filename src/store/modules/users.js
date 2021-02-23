@@ -1,6 +1,9 @@
+import mh from 'multihashes';
+import b58 from 'b58';
+import Debug from 'debug';
 import orbitdb from '@/orbitdb';
 
-
+const debug = Debug('nimtok:store:users');
 const state = {
   userCount: 0,
   users: Object.create(null),
@@ -9,7 +12,12 @@ const state = {
 
 function isId(s) {
   // NOTE: QmViiHeEFRJE1FcN2K5QJnVxCND1bSAq2DZv8R1KeTLQCY
-  return s.startsWith('Qm') && s.length == 46;
+  try {
+    mh.decode(b58.decode(s));
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 const getters = {
@@ -24,76 +32,47 @@ const getters = {
 
 const actions = {
   // This action is called by pubsub when a new user announces themself.
-  discovery({ commit }, obj) {
-    commit('addUser', {
-      id: obj.message.from,
-      ...obj.data.data,
+  discovery({ dispatch }, obj) {
+    debug('actions.discovery(%O)', obj);
+
+    dispatch('addUser', {
+        id: obj.message.from,
+        username: obj.data.username,
+        profile: obj.data.profile,
+      })
+      .catch(console.error);
+  },
+
+  async addUser({ commit }, user) {
+    debug('actions.addUser(%O)', user);
+    // Get profile data.
+    const profile = await orbitdb.odb.open(user.profile);
+
+    profile.events.on('ready', () => {
+      commit('addUser', {
+        id: user.id,
+        username: user.username,
+        ...profile.all,
+      });
     });
-
-    let db;
-    if ((db = orbitdb.databases.peers)) {
-      db
-        .put({
-          _id: obj.message.from,
-          ...obj.data.data,
-        })
-        .catch(console.error);
-    }
+    await profile.load();
   },
 
-  loadUsers({ commit }) {
-    let key;
+  async getUser({ state }, idOrUsername) {
+    debug('actions.getUser(%O)', idOrUsername);
 
-    for (let i = 0; (key = localStorage.key(i)); i++) {
-      if (!key.startsWith('auth:')) {
-        continue;
-      }
-
-      const user = JSON.parse(localStorage.getItem(key));
-      commit('addUser', user);
-    }
-  },
-
-  async getUser({ commit, state }, idOrUsername) {
     if (!isId(idOrUsername)) {
       idOrUsername = state.username2Id[idOrUsername];
     }
+
     let user = state.users[idOrUsername];
-
-    if (!user) {
-      // Get the user from OrbitDB.
-      let db;
-      if ((db = orbitdb.databases.peers)) {
-        user = db.get(idOrUsername);
-      }
-
-      if (user) {
-        commit('addUser', {
-          id: idOrUsername,
-          ...user,
-        });
-      }
-    }
-
-    if (user && user.profile) {
-      // Get profile...
-      const db = await orbitdb.odb.open(user.profile);
-      db.events.on('ready', () => {
-        console.log(db.all);
-      })
-      await db.load();
-    }
-
     return user;
   },
 };
 
 const mutations = {
   addUser(state, obj) {
-    if (state.users[obj.username]) {
-      console.warn('Skipping addUser, user exists. Perhaps you need updateUser()?');
-      return;
-    }
+    debug('mutations.addUser(%O)', obj);
 
     state.users[obj.id] = obj;
     state.username2Id[obj.username] = obj.id;

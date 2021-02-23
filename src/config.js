@@ -25,4 +25,5 @@ export default {
     MIN_LENGTH: 8,
     MAX_LENGTH: 20,
   },
+  IPFS_GATEWAY_URL: 'https://ipfs.io/',
 };
