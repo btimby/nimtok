@@ -9,6 +9,11 @@
 </template>
 
 <script>
+import Debug from 'debug';
+
+const debug = Debug('nimtok:Logout.vue');
+
+
 export default {
   props: {
     next: null,
@@ -16,11 +21,15 @@ export default {
 
   methods: {
     onLogout() {
+      debug('onLogout()');
+
+      // NOTE: this is done first to avoid racing with Login.vue.tryLogin().
+      sessionStorage.removeItem('auth:me');
+
       this.$store
         .dispatch('auth/logout', { next: this.next })
         .then(() => {
-          sessionStorage.clear('auth:me');
-          if (this.next && this.$router.currentRoute.path !== this.next) {
+          if (this.next && this.$route.path !== this.next) {
             this.$router.push(this.next);
           }
         })
