@@ -170,16 +170,15 @@ export default {
 
   methods: {
     onLogin() {
+      debug('onLogin()');
+
       this.$store
         .dispatch('auth/login', {
           next: this.next,
           username: this.user.username,
           password: this.form.password,
         })
-        .then((user) => {
-          this.setSession(user);
-          this.dialog = false;
-        })
+        .then(this.onAfterLogin)
         .catch(console.error);
     },
 
@@ -199,20 +198,19 @@ export default {
       if (user) {
         this.$store
           .dispatch('auth/login', { user })
-          .then((user) => {
-            this.setSession(user);
-            if (this.next && this.$router.currentRoute.path !== this.next) {
-              this.$router.push(this.next);
-            }
-          })
+          .then(this.onAfterLogin)
           .catch(console.error);
       }
     },
 
-    setSession(user) {
-      debug('setSession(%O', user);
+    onAfterLogin(user) {
+      debug('setSession(%O)', user);
 
       sessionStorage.setItem('auth:me', JSON.stringify(user));
+      if (this.next && this.$route.path !== this.next) {
+        this.$router.push(this.next);
+      }
+      this.dialog = false;
     }
   },
 }
