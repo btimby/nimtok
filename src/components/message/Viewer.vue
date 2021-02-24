@@ -7,7 +7,14 @@
 </template>
 
 <script>
+import TurndownService from 'turndown';
 import { Marked } from '@ts-stack/markdown';
+
+const TURNDOWN = new TurndownService({
+  emDelimiter: '_',
+  linkStyle: 'inlined',
+  headingStle: 'atx',
+});
 
 
 export default {
@@ -21,7 +28,7 @@ export default {
 
   methods: {
     onInput(ev) {
-      this.$emit('input', ev.target.innerHTML);
+      this.$emit('input', TURNDOWN.turndown(ev.target.innerHTML));
     },
   },
 }

@@ -25,7 +25,7 @@
     </v-container>
 
     <Viewer
-      v-model="value"
+      :value="value"
       class="viewer"
       ref="viewer"
       @input="onInput"
@@ -34,15 +34,8 @@
 </template>
 
 <script>
-import TurndownService from 'turndown';
 import Viewer from '@/components/message/Viewer';
 
-
-const TURNDOWN = new TurndownService({
-  emDelimiter: '_',
-  linkStyle: 'inlined',
-  headingStle: 'atx',
-});
 
 export default {
   name: 'Editor',
@@ -63,12 +56,12 @@ export default {
   },
 
   methods: {
-    onInput(html) {
-      this.$emit('input', TURNDOWN.turndown(html));
-    },
-
     apply(cmd, ...args) {
       document.execCommand(cmd, ...args);
+    },
+
+    onInput(value) {
+      this.$emit('input', value);
     },
   }
 }

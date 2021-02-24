@@ -37,13 +37,14 @@ const actions = {
     // Get profile data.
     const profile = await orbitdb.odb.open(user.profile);
 
-    profile.events.on('ready', () => {
+    profile.events.on('ready', async () => {
       debug('actions.addUser():profile %O', profile.all);
       const attrs = profile.all;
       attrs.id = user.id;
       attrs.username = user.username;
       attrs.profile = profile.id;
       commit('addUser', attrs);
+      await profile.close();
     });
     await profile.load();
   },

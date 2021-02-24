@@ -3,9 +3,43 @@
     <v-card>
       <v-card-title>What's on your mind?</v-card-title>
       <v-card-text>
-        <Editor
-          v-model="body"
-        />
+        <Mentionable
+          :keys="['@', '#']"
+          :items="items"
+          offset="6"
+          insert-space
+          @open="onOpen"
+        >
+          <Editor
+            v-model="body"
+          />
+
+          <template #no-result>
+            <div class="dim">
+              No result
+            </div>
+          </template>
+
+          <template #item-@="{ item }">
+            <div class="user">
+              {{ item.value }}
+              <span class="dim">
+                ({{ item.firstName }})
+              </span>
+            </div>
+          </template>
+
+          <template #item-#="{ item }">
+            <div class="issue">
+              <span class="number">
+                #{{ item.value }}
+              </span>
+              <span class="dim">
+                {{ item.label }}
+              </span>
+            </div>
+          </template>
+        </Mentionable>
         <Hashtags
           v-model="hashtags"
           @remove="onRemove"
@@ -21,14 +55,50 @@
 </template>
 
 <script>
+import { Mentionable } from 'vue-mention';
 import Hashtags from '@/components/message/Hashtags';
 import Editor from '@/components/message/Editor';
 
 const PATTERN_HASHTAG = /(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g;
 const PATTERN_MENTION = /@(\w+)\b/g;
 
+const USERS = [
+  {
+    value: 'akryum',
+    firstName: 'Guillaume',
+  },
+  {
+    value: 'posva',
+    firstName: 'Eduardo',
+  },
+  {
+    value: 'atinux',
+    firstName: 'Sébastien',
+  },
+];
+
+const ISSUES = [
+  {
+    value: 123,
+    label: 'Error with foo bar',
+    searchText: 'foo bar'
+  },
+  {
+    value: 42,
+    label: 'Cannot read line',
+    searchText: 'foo bar line'
+  },
+  {
+    value: 77,
+    label: 'I have a feature suggestion',
+    searchText: 'feature'
+  }
+];
+
+
 export default {
   components: {
+    Mentionable,
     Hashtags,
     Editor,
   },
@@ -36,6 +106,7 @@ export default {
   data() {
     return {
       body: null,
+      items: [],
     };
   },
 
@@ -71,7 +142,7 @@ export default {
 
   methods: {
     onPublish() {
-      this.$store.dispatch('posts/create', {
+      this.$store.dispatch('posts/post', {
         body: this.body,
         hashtags: this.hashtags,
         mentions: this.mentions,
@@ -82,6 +153,10 @@ export default {
       const pattern = new RegExp(`#${tag}\\b\\s*`, 'g');
       this.body = this.body.replace(pattern, '');
     },
+
+    onOpen(key) {
+      this.items = key === '@' ? USERS : ISSUES;
+    }
   }
 }
 </script>

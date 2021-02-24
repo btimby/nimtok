@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vue2Filters from 'vue2-filters';
 import VueAsyncComputed from 'vue-async-computed';
+import VTooltip from 'v-tooltip';
 import App from '@/App.vue';
 import router from '@/router';
 import orbitdb from '@/orbitdb';
@@ -16,6 +17,7 @@ localStorage.setItem('debug', 'nimtok:*');
 
 Vue.use(Vue2Filters);
 Vue.use(VueAsyncComputed);
+Vue.use(VTooltip);
 
 
 new Vue({
