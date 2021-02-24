@@ -10,9 +10,8 @@
         v-if="!authenticated"
         next="/feed"
       />
-      <Logout
+      <Account
         v-if="authenticated"
-        next="/"
       />
       <Register
         v-if="!authenticated"
@@ -33,8 +32,8 @@
 </template>
 
 <script>
-import Login from '@/components/Login';
-import Logout from '@/components/Logout';
+import Login from '@/components/user/Login';
+import Account from '@/components/user/Account';
 import Register from '@/components/register/Register';
 import Footer from '@/components/Footer';
 import { mapGetters } from 'vuex';
@@ -45,7 +44,7 @@ export default {
 
   components: {
     Login,
-    Logout,
+    Account,
     Register,
     Footer,
   },

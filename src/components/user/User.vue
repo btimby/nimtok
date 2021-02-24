@@ -2,15 +2,13 @@
   <v-container
     id="container"
   >
-    <v-row id="chosen">
+    <v-row id="row">
       <Avatar
         :value="avatar"
       />
       <span id="username">
         <Identity
           :hash="identity.id"
-          :width="24"
-          :height="24"
         />
         <span
           :title="usernameOrDefault"
@@ -77,7 +75,7 @@ export default {
   padding: 10px 0px 0px 0px;
 }
 
-#chosen {
+#row {
   display: inline-block;
   white-space: nowrap;
   text-align: center;

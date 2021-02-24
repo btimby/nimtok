@@ -9,8 +9,8 @@ export default {
     IMG_COUNT: 15,
   },
   IDENTICON: {
-    WIDTH: 80,
-    HEIGHT: 80,
+    WIDTH: 24,
+    HEIGHT: 24,
   },
   PEER_KEY_OPTS: {
     bits: 1024,

@@ -1,10 +1,16 @@
 <template>
-  <img
-    :src="identicon"
-    :title="title"
-    :width="width"
-    :height="height"
-  />
+  <v-avatar
+    left
+    :size="width"
+    class="rounded-0"
+  >
+    <img
+      :src="identicon"
+      :title="title"
+      :width="width"
+      :height="height"
+    />
+  </v-avatar>
 </template>
 
 <script>
@@ -18,6 +24,7 @@ export default {
   props: {
     hash: String,
     title: String,
+
     width: {
       type: Number,
       default: config.IDENTICON.WIDTH,
