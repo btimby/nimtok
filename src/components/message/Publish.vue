@@ -132,7 +132,7 @@ export default {
         const m = [...this.body.matchAll(PATTERN_MENTION)];
 
         for (let i in m) {
-          mentions[m[i][1].toLowerCase()] = null;
+          mentions[m[i][1]] = null;
         }
       }
 

@@ -47,7 +47,6 @@ const mutations = {
 
     const hour = getHourBucket();
     let bucket = state.mentions[hour];
-    name = name.toLowerCase();
 
     if (!bucket) {
         bucket = state.mentions[hour] = {};
