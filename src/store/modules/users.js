@@ -49,11 +49,12 @@ const actions = {
     const profile = await orbitdb.odb.open(user.profile);
 
     profile.events.on('ready', () => {
-      commit('addUser', {
-        id: user.id,
-        username: user.username,
-        ...profile.all,
-      });
+      debug('actions.addUser():profile %O', profile.all);
+      const attrs = profile.all;
+      attrs.id = user.id;
+      attrs.username = user.username;
+      attrs.profile = profile.id;
+      commit('addUser', attrs);
     });
     await profile.load();
   },
@@ -74,7 +75,12 @@ const mutations = {
   addUser(state, obj) {
     debug('mutations.addUser(%O)', obj);
 
-    state.users[obj.id] = obj;
+    // NOTE: updated in this manner to trigger a refresh.
+    state.users = {
+      ...state.users,
+      [obj.id]: obj,
+    }
+
     state.username2Id[obj.username] = obj.id;
     state.userCount = Object.keys(state.users).length;
   },

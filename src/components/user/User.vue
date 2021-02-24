@@ -4,11 +4,11 @@
   >
     <v-row id="chosen">
       <Avatar
-        :value="user.avatar"
+        :value="avatar"
       />
       <span id="username">
         <Identity
-          :hash="user.identity.id"
+          :hash="identity.id"
           :width="24"
           :height="24"
         />
@@ -33,9 +33,8 @@ export default {
   },
 
   props: {
-    id: String,
     identity: Object,
-    avatar: String,
+    avatar: Object,
     username: String,
 
     small: Boolean,
@@ -45,14 +44,6 @@ export default {
   computed: {
     usernameOrDefault() {
       return this.username || "Username";
-    },
-
-    user() {
-      return {
-        avatar: this.avatar,
-        username: this.username,
-        identity: this.identity,
-      };
     },
   },
 

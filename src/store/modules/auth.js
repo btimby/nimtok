@@ -52,6 +52,17 @@ function deserializeUser(obj, password) {
   return user;
 }
 
+function getImageData(dataUri) {
+  let dataStr = atob(dataUri.split(',')[1]);
+  const dataArr = new Uint8Array(dataStr.length);
+
+  for (let i = 0; i < dataStr.length; i++) {
+      dataArr[i] = dataStr.charCodeAt(i);
+  }
+
+  return new Blob([dataArr]);
+}
+
 const getters = {
   me: state => {
     return state.me;
@@ -131,6 +142,7 @@ const actions = {
   
       const auth = serializeUser(user);
   
+      debug('actions.create() - connecting.');
       orbitdb.connect({
           options: {
             repo: user.username,
@@ -141,9 +153,11 @@ const actions = {
           },
         })
         .then(() => {
+          debug('actions.create() - uploading avatar.');
+
           // Upload avatar image to ipfs.
-          const avatar = user.avatar.split(',')[1];
-          const prom1 = orbitdb.node.add(atob(avatar));
+          const blob = getImageData(user.avatar.data);
+          const prom1 = orbitdb.node.add(blob);
           // Open the profile database for writing.
           const prom2 = new Promise((resolve, reject) => {
             try {
@@ -160,6 +174,8 @@ const actions = {
           Promise
             .all([prom1, prom2])
             .then(([avatar, profile]) => {
+              debug('auth.create() - setting up profile.');
+
               profile.db.set('avatar', avatar.path);
               profile.db.set('bio', user.bio);
               auth.profile = profile.db.id;

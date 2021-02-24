@@ -1,18 +1,22 @@
 <template>
   <img
-      :src="src"
-      :width="width"
-      :height="height"
+    ref="img"
+    :width="width"
+    :height="height"
   />
 </template>
 
 <script>
+import Debug from 'debug';
 import config from '@/config';
+import orbitdb from '@/orbitdb';
+
+const debug = Debug('nimtok:Avatar.vue');
 
 
 export default {
   props: {
-    value: String,
+    value: Object,
 
     width: {
       type: Number,
@@ -23,14 +27,33 @@ export default {
       default: config.AVATAR.HEIGHT,
     },
   },
-  
-  computed: {
-    src() {
-      if (this.value) {
-        return this.value;
+
+  mounted() {
+    if (this.value.data) {
+      this.$refs.img.setAttribute('src', this.value.data);
+    } else if (this.value.cid) {
+      debug('Loading image from ipfs');
+      this
+        .loadImage(this.value.cid)
+        .catch(console.error);
+    }
+  },
+
+  methods: {
+    async loadImage(cid) {
+      const parts = [];
+
+      for await (const chunk of orbitdb.node.cat(cid)) {
+        debug('Got chunk of %i bytes', chunk.length)
+        parts.push(chunk);
       }
-      return null;
-    },
+      const blob = new Blob(parts, { type: 'image/png' });
+      const reader = new FileReader(blob);
+      reader.onload = (e) => {
+        this.$refs.img.setAttribute('src', e.target.result);
+      }
+      reader.readAsDataURL(blob);
+    }
   },
 }
 </script>

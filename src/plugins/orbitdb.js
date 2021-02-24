@@ -1,7 +1,9 @@
 // TODO: make external project.
+import Debug from 'debug';
 import Ipfs from 'ipfs';
 import OrbitDB from 'orbit-db';
 
+const debug = Debug('VueOrbitDB');
 const DB_ADDR = /'(\/orbitdb\/\w+\/\w+)'/;
 const IPFSOPTIONS = {
   EXPERIMENTAL: {
@@ -79,6 +81,7 @@ class VueOrbitDB {
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
     for (let key in this.databases) {
+      debug('opening database %S', key);
       const db = this.databases[key];
       await db.open(this);
     }

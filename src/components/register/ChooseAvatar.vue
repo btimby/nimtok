@@ -73,7 +73,8 @@ export default {
   },
 
   props: {
-    value: String,
+    value: Object,
+
     width: {
       type: Number,
       default: config.AVATAR.WIDTH,
@@ -103,7 +104,7 @@ export default {
       const url = `${BASE_URL}${name}`;
       urlToDataUrl(url)
         .then((data) => {
-          this.$emit('input', data);
+          this.$emit('input', { data });
         });
     },
 
@@ -137,7 +138,7 @@ export default {
     },
 
     onUpload(data) {
-      this.$emit('input', data);
+      this.$emit('input', { data });
     }
   }
 }

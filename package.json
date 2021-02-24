@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "signal": "webrtc-star --host=127.0.0.1",
+    "playground": "python2 -m SimpleHTTPServer 8081",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },

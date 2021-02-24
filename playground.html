@@ -1,0 +1,60 @@
+<html>
+    <head>
+        
+    </head>
+
+    <body>
+        <h1>IPFS playground.</h1>
+        <img id="source" src="/public/avatars/avatar-00.png"/>
+    </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"></script>
+    <script type="text/javascript">
+    window.localStorage.setItem('debug', 'ipfs:*');
+
+    function getImageData(img) {
+        let canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        let dataURL = canvas.toDataURL('image/png');
+        let dataStr = atob(dataURL.split(',')[1]);
+        const dataArr = new Uint8Array(dataStr.length);
+        for (let i = 0; i < dataStr.length; i++) {
+            dataArr[i] = dataStr.charCodeAt(i);
+        }
+        return new Blob([dataArr]);
+    }
+
+    Ipfs
+        .create({
+            config: {
+                Addresses: {
+                    Swarm: [
+                        '/ip4/127.0.0.1/tcp/9090/ws/p2p-webrtc-star'
+                    ],
+                },
+            },
+            EXPERIMENTAL: {
+                pubsub: true,
+            }
+        }).then((node) => {
+            window.node = node;
+
+            const source = document.getElementById('source');
+            let blob = getImageData(source);
+
+            node
+                .add(blob)
+                .then((obj) => {
+                    console.log(obj);
+                    const dest = document.createElement('img');
+                    dest.setAttribute('src', 'https://ipfs.io/ipfs/' + obj.path);
+                    document.getElementsByTagName('body')[0].appendChild(dest);
+                });
+        });
+    </script>
+</html>

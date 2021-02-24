@@ -104,10 +104,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import Debug from 'debug';
 import ChooseAvatar from '@/components/register/ChooseAvatar';
 import ChooseIdentity from '@/components/register/ChooseIdentity';
 import User from '@/components/user/User';
 import config from '@/config';
+
+const debug = Debug('nimtok:Register.vue');
 
 
 export default {
@@ -135,7 +138,7 @@ export default {
         username: null,
         email: null,
         password: null,
-        avatar: null,
+        avatar: {},
         identity: {},
         bio: null,
       },
@@ -168,9 +171,14 @@ export default {
           user: this.form,
         })
         .then((auth) => {
+          debug('Storing to sessionStorage');
+          sessionStorage.setItem('auth:me', JSON.stringify(auth));
+
           // Save user to localstorage (for Login).
+          debug('Storing to localStorage');
           delete auth.identity;
           localStorage.setItem(`auth:${auth.username}`, JSON.stringify(auth));
+
           this.dialog = false;
           if (this.next && this.$route.push !== this.next) {
             this.$router.push(this.next);

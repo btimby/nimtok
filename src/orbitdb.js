@@ -25,14 +25,14 @@ const peers = new VueOrbitStore('peers', 'docstore', {
       peer._srcOrbitDB = true;
       delete peer._id;
 
-      store.commit('users/addUser', peer);
+      store.dispatch('users/addUser', peer);
     }
   }
 });
 
-const hashtags = new VueOrbitStore('hashtags', 'keyvalue', {
+/*const hashtags = new VueOrbitStore('hashtags', 'keyvalue', {
   address: config.HASHTAG_DB,
-});
+});*/
 
 const inbox = new VueOrbitStore('inbox', 'feed', {
   createOptions: {
@@ -66,7 +66,7 @@ const orbitdb = new VueOrbitDB({
     followers,
     peers,
     inbox,
-    hashtags,
+    // hashtags,
   },
   options: {
     relay: {
@@ -140,7 +140,7 @@ function addUser(user) {
 store.subscribe((mutation, state) => {
   debug('store:subscribe(%O, %O)', mutation, state);
 
-  if (mutation.payload._srcOrbitDB) {
+  if (mutation.payload && mutation.payload._srcOrbitDB) {
     debug('Skipping circular %s mutation', mutation.type);
     return;
   }
