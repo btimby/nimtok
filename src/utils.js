@@ -23,9 +23,15 @@ function arr2str(a) {
   return DECODER.decode(a);
 }
 
+function getHourBucket() {
+  const d = new Date();
+  const hour = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
+  return hour.getTime();
+}
 
 export {
   str2arr,
   arr2str,
   isId,
+  getHourBucket,
 };

@@ -10,6 +10,7 @@ Vue.use(VueOrbitDB);
 const debug = Debug('nimtok:orbitdb');
 const profile = new VueOrbitStore('profile', 'keyvalue');
 const posts = new VueOrbitStore('posts', 'feed');
+const feed = new VueOrbitStore('feed', 'feed');
 const following = new VueOrbitStore('following', 'docstore', {
   afterOpen() {
     debug('following.afterOpen');
@@ -28,20 +29,19 @@ const following = new VueOrbitStore('following', 'docstore', {
 
           // NOTE: new post from a followed user.
           const { type, hashtags, mentions, posts, cid } = obj.data;
-          // TODO: remove this.
-          mentions;
           if (type !== 'post') {
             debug('pubsub:following:%s skipping', obj.message.from);
             return;
           }
 
-          store.dispatch('posts/addPost', {
+          store.dispatch('feed/addPost', {
             user: { id: obj.message.from },
             post: { cid, },
             posts,
           });
 
           store.dispatch('hashtags/incr', hashtags);
+          store.dispatch('mentions/incr', mentions);
         });
       }
     });
@@ -107,6 +107,7 @@ const orbitdb = new VueOrbitDB({
   databases: {
     profile,
     posts,
+    feed,
     following,
     followers,
     peers,

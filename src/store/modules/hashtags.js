@@ -1,4 +1,5 @@
 import Debug from 'debug';
+import { getHourBucket } from '@/utils';
 
 
 const debug = Debug('nimtok:store:hashtags');
@@ -18,18 +19,44 @@ const actions = {
     for (let i in hashtags) {
       commit('incr', hashtags[i], n);
     }
-  }
+  },
+
+  getByTag(tag) {
+    const stats = {
+      total: 0,
+      hourly: {},
+    };
+    const buckets = Object.keys(state.hashtags);
+
+    for (let i in buckets) {
+      const key = buckets[i];
+      const bucket = state.hashtags[key];
+      const count = bucket[tag];
+      stats.total += count;
+      stats.hourly[key] = count;
+    }
+
+    return stats;
+  },
 };
 
 const mutations = {
   incr(state, tag, n = 1) {
     debug('mutations.incr(%s, %i)', tag, n);
 
-    if (!state.hashtags[tag]) {
-      state.hashtags[tag] = n;
+    const hour = getHourBucket();
+    let bucket = state.hashtags[hour];
+    tag = tag.toLowerCase();
+
+    if (!bucket) {
+      bucket = state.hashtags[hour] = {};
+    }
+
+    if (!bucket[tag]) {
+      bucket[tag] = n;
       return;
     }
-    state.hashtags[tag] += n;
+    bucket[tag] += n;
   },
 };
 
