@@ -23,6 +23,7 @@
     "turndown": "^7.0.0",
     "tweetnacl": "^1.0.3",
     "vue": "^2.6.11",
+    "vue-async-computed": "^3.9.0",
     "vue-image-upload-resize": "^2.3.0",
     "vue-router": "^3.5.1",
     "vue2-filters": "^0.12.0",

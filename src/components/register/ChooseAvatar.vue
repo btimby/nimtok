@@ -73,7 +73,7 @@ export default {
   },
 
   props: {
-    value: Object,
+    value: String,
 
     width: {
       type: Number,
@@ -104,7 +104,7 @@ export default {
       const url = `${BASE_URL}${name}`;
       urlToDataUrl(url)
         .then((data) => {
-          this.$emit('input', { data });
+          this.$emit('input', data);
         });
     },
 
@@ -138,7 +138,7 @@ export default {
     },
 
     onUpload(data) {
-      this.$emit('input', { data });
+      this.$emit('input', data);
     }
   }
 }

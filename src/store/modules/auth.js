@@ -156,8 +156,20 @@ const actions = {
           debug('actions.create() - uploading avatar.');
 
           // Upload avatar image to ipfs.
-          const blob = getImageData(user.avatar.data);
-          const prom1 = orbitdb.node.add(blob);
+          const prom1 = new Promise((resolve, reject) => {
+            let blob;
+            try {
+              blob = getImageData(user.avatar);
+            } catch(e) {
+              reject(e);
+              return;
+            }
+
+            orbitdb.node
+              .add(blob)
+              .then(resolve)
+              .catch(reject);
+          });
           // Open the profile database for writing.
           const prom2 = new Promise((resolve, reject) => {
             try {

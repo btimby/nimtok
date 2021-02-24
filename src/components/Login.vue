@@ -141,6 +141,10 @@ export default {
       }
 
       const user = JSON.parse(localStorage.getItem(key));
+      // TODO: remove this, it temporarily works around an issue.
+      if (user.avatar && user.avatar.data) {
+        user.avatar = user.avatar.data;
+      }
       this.users.push(user);
     }
 

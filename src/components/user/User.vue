@@ -34,7 +34,7 @@ export default {
 
   props: {
     identity: Object,
-    avatar: Object,
+    avatar: String,
     username: String,
 
     small: Boolean,

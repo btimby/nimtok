@@ -25,5 +25,6 @@ export default {
     MIN_LENGTH: 8,
     MAX_LENGTH: 20,
   },
+  AVATAR_USE_GATEWAY: false,
   IPFS_GATEWAY_URL: 'https://ipfs.io/',
 };

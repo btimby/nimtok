@@ -1,7 +1,6 @@
-import mh from 'multihashes';
-import b58 from 'b58';
 import Debug from 'debug';
 import orbitdb from '@/orbitdb';
+import { isId } from '@/utils';
 
 const debug = Debug('nimtok:store:users');
 const state = {
@@ -9,16 +8,6 @@ const state = {
   users: Object.create(null),
   username2Id: Object.create(null),
 };
-
-function isId(s) {
-  // NOTE: QmViiHeEFRJE1FcN2K5QJnVxCND1bSAq2DZv8R1KeTLQCY
-  try {
-    mh.decode(b58.decode(s));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
 
 const getters = {
   userCount(state) {

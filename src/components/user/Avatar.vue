@@ -1,6 +1,6 @@
 <template>
   <img
-    ref="img"
+    :src="src"
     :width="width"
     :height="height"
   />
@@ -10,13 +10,14 @@
 import Debug from 'debug';
 import config from '@/config';
 import orbitdb from '@/orbitdb';
+import { isId } from '@/utils';
 
 const debug = Debug('nimtok:Avatar.vue');
 
 
 export default {
   props: {
-    value: Object,
+    value: String,
 
     width: {
       type: Number,
@@ -28,15 +29,20 @@ export default {
     },
   },
 
-  mounted() {
-    if (this.value.data) {
-      this.$refs.img.setAttribute('src', this.value.data);
-    } else if (this.value.cid) {
-      debug('Loading image from ipfs');
-      this
-        .loadImage(this.value.cid)
-        .catch(console.error);
-    }
+  asyncComputed: {
+    async src() {
+      if (this.value.startsWith('data:image/png;base64,')) {
+        return this.value;
+      } else if (isId(this.value)) {
+        if (config.AVATAR_USE_GATEWAY) {
+          return `${config.IPFS_GATEWAY_URL}ipfs/${this.value}`;
+        } else {
+          return await this.loadImage(this.value);
+        }
+      } else {
+        debug('Could not determine image type');
+      }
+    },
   },
 
   methods: {
@@ -47,12 +53,20 @@ export default {
         debug('Got chunk of %i bytes', chunk.length)
         parts.push(chunk);
       }
+
       const blob = new Blob(parts, { type: 'image/png' });
       const reader = new FileReader(blob);
-      reader.onload = (e) => {
-        this.$refs.img.setAttribute('src', e.target.result);
-      }
-      reader.readAsDataURL(blob);
+
+      return new Promise((resolve, reject) => {
+        try {
+          reader.onload = (e) => {
+            resolve(e.target.result);
+          }
+          reader.readAsDataURL(blob);
+        } catch(e) {
+          reject(e);
+        }
+      });
     }
   },
 }
