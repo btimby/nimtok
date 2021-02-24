@@ -1,7 +1,8 @@
 <template>
   <div
-    @input="onInput"
+    id="viewer"
     v-html="innerValue"
+    @input="onInput"
   />
 </template>
 
@@ -27,5 +28,8 @@ export default {
 </script>
 
 <style scoped>
-
+#viewer {
+  min-height: 120px;
+  padding: 5px;
+}
 </style>

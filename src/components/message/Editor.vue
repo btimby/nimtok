@@ -26,6 +26,7 @@
 
     <Viewer
       v-model="value"
+      class="viewer"
       ref="viewer"
       @input="onInput"
     />
@@ -74,4 +75,7 @@ export default {
 </script>
 
 <style scoped>
+.viewer {
+  border: 1px solid gray;
+}
 </style>
