@@ -20,7 +20,7 @@ const actions = {
     store.dispatch('hashtags/incr', obj.hashtags);
 
     const me = store.getters['auth/me'];
-    commit('addPost', {
+    commit('ADD_POST', {
       user: { id: me.id, },
       body: obj.body,
       hashtags: obj.hashtags,
@@ -30,8 +30,8 @@ const actions = {
 };
 
 const mutations = {
-  addPost(state, obj) {
-    debug('mutations.addPost(%O)', obj);
+  ADD_POST(state, obj) {
+    debug('mutations.ADD_POST(%O)', obj);
 
     let posts = state.posts[obj.user.id];
     if (!posts) {

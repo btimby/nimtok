@@ -32,8 +32,8 @@ const actions = {
 };
 
 const mutations = {
-  addUser(state, obj) {
-    debug('mutations.addUser(%O)', obj);
+  ADD_USER(state, obj) {
+    debug('mutations.ADD_USER(%O)', obj);
 
     // NOTE: updated in this manner to trigger a refresh.
     state.users = {

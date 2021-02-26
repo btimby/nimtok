@@ -92,7 +92,6 @@ const actions = {
       }
     }
 
-    // TODO: move this to orbitdb.js, into the mutation subscription (auth/setMe).
     return new Promise((resolve, reject) => {
       orbitdb
         .connect({
@@ -108,7 +107,7 @@ const actions = {
           // Don't store sensitive fields in session.
           delete user.nonce;
           delete user.secret;
-          commit('setMe', user);
+          commit('SET_ME', user);
           resolve(user);
         })
         .catch(reject);
@@ -120,7 +119,7 @@ const actions = {
 
     return new Promise((resolve, reject) => {
       try {
-        commit('delMe');
+        commit('DEL_ME');
         orbitdb.shutdown();
       } catch (e) {
         reject(e);
@@ -193,7 +192,7 @@ const actions = {
               auth.profile = profile.db.id;
 
               // Save user to session (for persistent login).
-              commit('setMe', auth);
+              commit('SET_ME', auth);
               resolve(auth);
             })
             .catch(reject);
@@ -204,14 +203,14 @@ const actions = {
 };
 
 const mutations = {
-  setMe(state, obj) {
-    debug('mutations.setMe(%O)', obj);
+  SET_ME(state, obj) {
+    debug('mutations.SET_ME(%O)', obj);
 
     state.me = obj;
   },
 
-  delMe(state) {
-    debug('mutations.delMe()');
+  DEL_ME(state) {
+    debug('mutations.DEL_ME()');
 
     state.me = undefined;
   },

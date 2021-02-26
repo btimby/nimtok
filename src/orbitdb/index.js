@@ -70,7 +70,7 @@ const orbitdb = new VueOrbitDB({
 
       orbitdb.publish(obj.message.from, {
         ...nodeInfo,
-        hashtags: store.actions['hashtags/getTopN'](config.HASHTAG_TRADE_COUNT),
+        hashtags: store.actions['hashtags/getTopN'](config.BUCKET_TRADE_COUNT),
       });
     });
     orbitdb.subscribe(orbitdb.id.id, (obj) => {

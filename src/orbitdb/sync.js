@@ -58,7 +58,7 @@ class ToVuex {
               ...user,
               ...profile.all,
             };
-            store.commit('users/addUser', user);
+            store.commit('users/ADD_USER', user);
 
             profile
               .close()

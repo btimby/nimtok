@@ -16,12 +16,12 @@ const actions = {
   addAlert({ commit }, obj) {
     debug('actions.addAlert(%O)', obj);
 
-    commit('addAlert', obj);
+    commit('ADD_ALERT', obj);
   },
 };
   
 const mutations = {
-  addAlert(state, obj) {
+  ADD_ALERT(state, obj) {
     debug('mutations.addAlert(%O)', obj);
 
     state.alerts.push(obj);

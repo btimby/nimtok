@@ -19,13 +19,13 @@ const actions = {
   addItem({ commit }, obj) {
     debug('actions.addItem(%O)', obj);
 
-    commit('addItem', obj);
+    commit('ADD_ITEM', obj);
   },
 };
 
 const mutations = {
-  addItem(state, obj) {
-    debug('mutations.addItem(%O)', obj);
+  ADD_ITEM(state, obj) {
+    debug('mutations.ADD_ITEM(%O)', obj);
 
     state.feed.push(obj);
     state.new.posts++;
