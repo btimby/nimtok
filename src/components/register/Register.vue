@@ -138,7 +138,7 @@ export default {
         username: null,
         email: null,
         password: null,
-        avatar: {},
+        avatar: null,
         identity: {},
         bio: null,
       },

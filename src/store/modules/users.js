@@ -1,5 +1,4 @@
 import Debug from 'debug';
-import orbitdb from '@/orbitdb';
 import { isId } from '@/utils';
 
 const debug = Debug('nimtok:store:users');
@@ -20,35 +19,6 @@ const getters = {
 };
 
 const actions = {
-  // This action is called by pubsub when a new user announces themself.
-  discovery({ dispatch }, obj) {
-    debug('actions.discovery(%O)', obj);
-
-    dispatch('addUser', {
-        id: obj.message.from,
-        username: obj.data.username,
-        profile: obj.data.profile,
-      })
-      .catch(console.error);
-  },
-
-  async addUser({ commit }, user) {
-    debug('actions.addUser(%O)', user);
-    // Get profile data.
-    const profile = await orbitdb.odb.open(user.profile);
-
-    profile.events.on('ready', async () => {
-      debug('actions.addUser():profile %O', profile.all);
-      const attrs = profile.all;
-      attrs.id = user.id;
-      attrs.username = user.username;
-      attrs.profile = profile.id;
-      commit('addUser', attrs);
-      await profile.close();
-    });
-    await profile.load();
-  },
-
   async getUser({ state }, idOrUsername) {
     debug('actions.getUser(%O)', idOrUsername);
 

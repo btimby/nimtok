@@ -1,5 +1,7 @@
 # nimtok
 
+
+
 ## Project setup
 ```
 npm install
@@ -8,7 +10,10 @@ npm install
 ### Compiles and hot-reloads for development
 ```
 npm run serve
+npm run signal
 ```
+
+The first command starts the Vue development server. The second runs a webrtc signalling server.
 
 ### Compiles and minifies for production
 ```

@@ -39,7 +39,7 @@ class VueOrbitStore {
     } else {
       throw new Error('Cannot open database, no name or address!');
     }
-    this.hooks.afterOpen && this.hooks.afterOpen();
+    this.hooks.afterOpen && this.hooks.afterOpen(this.cn);
     // Hook can return false to abort load.
     if (this.load || this.hooks.afterLoad && (
       !this.hooks.beforeLoad || this.hooks.beforeLoad() !== false
@@ -47,7 +47,7 @@ class VueOrbitStore {
       this.db
         .load()
         .then(() => {
-          this.hooks.afterLoad && this.hooks.afterLoad();
+          this.hooks.afterLoad && this.hooks.afterLoad(this.cn);
         })
         .catch(console.error);
     }
@@ -55,7 +55,7 @@ class VueOrbitStore {
 }
 
 class VueOrbitDB {
-  constructor({ store, databases, options, beforeConnect, afterConnect, }) {
+  constructor({ store, databases, options, beforeConnect, afterConnect, meta, }) {
     this._store = store;
     this._actions = new Map();
     this.node = null;
@@ -65,6 +65,9 @@ class VueOrbitDB {
     this.hooks = {
       beforeConnect,
       afterConnect,
+    };
+    this.meta = {
+      ...meta,
     };
   }
 
@@ -77,11 +80,14 @@ class VueOrbitDB {
       ...this.options,
       ...options,
     });
-    this.meta = meta;
+    this.meta = {
+      ...this.meta,
+      ...meta,
+    };
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
     for (let key in this.databases) {
-      debug('opening database %S', key);
+      debug('opening database %s', key);
       const db = this.databases[key];
       await db.open(this);
     }

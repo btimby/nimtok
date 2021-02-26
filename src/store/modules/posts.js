@@ -1,5 +1,4 @@
 import Debug from 'debug';
-import orbitdb from '@/orbitdb';
 import store from '@/store';
 
 
@@ -27,21 +26,6 @@ const actions = {
       hashtags: obj.hashtags,
       mentions: obj.mentions,
     });
-  },
-
-  async addPost({ commit }, obj) {
-    debug('actions.addPost(%O)', obj);
-
-    // Look up post in remote user db.
-    const posts = await orbitdb.open(obj.posts);
-    posts.db.events.on('ready', async () => {
-      const post = posts.db.get(obj.post.cid);
-      commit('addPost', post);
-      await posts.close();
-    });
-    await posts.load();
-
-    commit('addPost', obj);
   },
 };
 

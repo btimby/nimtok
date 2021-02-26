@@ -25,8 +25,21 @@ function arr2str(a) {
 
 function getHourBucket() {
   const d = new Date();
-  const hour = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours());
-  return hour.getTime();
+  const hour = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours()).getTime();
+  // Adjust by TZ offset milliseconds (convert to UTC).
+  return hour + d.getTimezoneOffset() * 60 * 1000;
+}
+
+function invert(o) {
+  const inverted = {};
+  const keys = Object.keys(o);
+  const vals = Object.keys(o);
+
+  for (let i in keys) {
+    inverted[vals[i]] = keys[i];
+  }
+
+  return inverted;
 }
 
 export {
@@ -34,4 +47,5 @@ export {
   arr2str,
   isId,
   getHourBucket,
+  invert,
 };
