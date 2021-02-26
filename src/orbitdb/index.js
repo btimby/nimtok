@@ -47,8 +47,8 @@ const orbitdb = new VueOrbitDB({
   meta: {
     Sync: Sync,
   },
-  afterConnect() {
-    debug('connection:afterConnect');
+  afterConnect(orbitdb) {
+    debug('connection:afterConnect(%O)', orbitdb);
 
     // Collect node information for discovery.
     profile.db.set('inbox', inbox.db.id);
@@ -97,6 +97,30 @@ const orbitdb = new VueOrbitDB({
       orbitdb.publish('discovery', nodeInfo);
     }, config.DISCOVERY_WAIT);  
   },
+});
+
+// Sync vuex -> orbitdb.
+store.subscribe((mutation, state) => {
+  debug('store:subscribe(%O, %O)', mutation, state);
+
+  if (mutation.payload && mutation.payload._srcOrbitDB) {
+    debug('Skipping circular %s mutation', mutation.type);
+    return;
+  }
+
+  switch (mutation.type) {
+    case 'users/addUser':
+      Sync.ToOrbitDB.peer(orbitdb, mutation.payload);
+      break;
+
+    case 'posts/addPost':
+      Sync.ToOrbitDB.post(orbitdb, mutation.payload);
+      break;
+
+    default:
+      debug('Unhandled mutation type: %s', mutation.type);
+      break;
+  }
 });
 
 

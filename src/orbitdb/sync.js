@@ -1,6 +1,7 @@
 import Debug from 'debug';
 import store from '@/store';
 import peers from '@/orbitdb/peers';
+import posts from '@/orbitdb/posts';
 
 const debug = Debug('nimtok:orbitdb:sync');
 
@@ -78,7 +79,7 @@ class ToOrbitDB {
   static peer(orbitdb, peer) {
     debug('Sync.ToOrbitDB.peer(%O)', peer);
 
-    orbitdb.databases.peers.db
+    peers.db
       .put({
         _id: peer.id,
         id: peer.id,
@@ -91,7 +92,7 @@ class ToOrbitDB {
   static post(orbitdb, post) {
     debug('Sync.ToOrbitDB.post(%O)', post);
 
-    orbitdb.databases.posts.db
+    posts.db
       .add(post)
       .then((cid) => {
         orbitdb.publish(orbitdb.id.id, {
@@ -111,30 +112,6 @@ const Sync = {
   ToVuex,
   ToOrbitDB,
 };
-
-// Sync vuex -> orbitdb.
-store.subscribe((mutation, state) => {
-  debug('store:subscribe(%O, %O)', mutation, state);
-
-  if (mutation.payload && mutation.payload._srcOrbitDB) {
-    debug('Skipping circular %s mutation', mutation.type);
-    return;
-  }
-
-  switch (mutation.type) {
-    case 'users/addUser':
-      Sync.ToOrbitDB.peer(mutation.payload);
-      break;
-
-    case 'posts/addPost':
-      Sync.ToOrbitDB.post(mutation.payload);
-      break;
-
-    default:
-      debug('Unhandled mutation type: %s', mutation.type);
-      break;
-  }
-});
 
 
 export default Sync;

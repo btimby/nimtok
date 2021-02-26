@@ -4,7 +4,7 @@
       v-for="(user, i) in users"
       :key="i"
       :identity="{ id: user.id }"
-      :avatar="{ cid: user.avatar }"
+      :avatar="user.avatar"
       :username="user.username"
     />
   </v-container>

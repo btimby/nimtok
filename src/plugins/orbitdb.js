@@ -31,7 +31,7 @@ class VueOrbitStore {
 
   async open(connection) {
     this.cn = connection;
-    this.hooks.beforeOpen && this.hooks.beforeOpen();
+    this.hooks.beforeOpen && this.hooks.beforeOpen(this.cn);
     if (this.address) {
       this.db = await this.cn.odb.open(this.address, this.type);
     } else if (this.name) {
@@ -42,7 +42,7 @@ class VueOrbitStore {
     this.hooks.afterOpen && this.hooks.afterOpen(this.cn);
     // Hook can return false to abort load.
     if (this.load || this.hooks.afterLoad && (
-      !this.hooks.beforeLoad || this.hooks.beforeLoad() !== false
+      !this.hooks.beforeLoad || this.hooks.beforeLoad(this.cn) !== false
     )) {
       this.db
         .load()
@@ -74,7 +74,7 @@ class VueOrbitDB {
   static install() {}
 
   async connect({ options, meta }) {
-    this.hooks.beforeConnect && this.hooks.beforeConnect();
+    this.hooks.beforeConnect && this.hooks.beforeConnect(this);
     this.node = await Ipfs.create({
       ...IPFSOPTIONS,
       ...this.options,
@@ -92,7 +92,7 @@ class VueOrbitDB {
       await db.open(this);
     }
     window.$orbitdb = this;
-    this.hooks.afterConnect && this.hooks.afterConnect();
+    this.hooks.afterConnect && this.hooks.afterConnect(this);
   }
 
   async shutdown() {

@@ -6,7 +6,7 @@ const debug = Debug('nimtok:orbitdb:peers');
 
 const peers = new VueOrbitStore('peers', 'docstore', {
   afterLoad(orbitdb) {
-    debug('peers:afterLoad');
+    debug('peers:afterLoad(%O)', orbitdb);
     orbitdb.meta.Sync.ToVuex.users(orbitdb);
   }
 });
