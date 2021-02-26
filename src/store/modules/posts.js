@@ -18,6 +18,7 @@ const actions = {
     debug('actions.post(%O)', obj);
 
     store.dispatch('hashtags/incr', obj.hashtags);
+    store.dispatch('mentions/incr', obj.mentions);
 
     const me = store.getters['auth/me'];
     commit('ADD_POST', {

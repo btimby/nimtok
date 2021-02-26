@@ -1,6 +1,4 @@
-import {
-  buckets, getByTag, getTopN, incr, merge, INCR, SET, PRUNE,
-} from '@/store/modules/buckets';
+import { getters, actions, mutations, } from '@/store/modules/buckets';
 
 const state = {
   buckets: {},
@@ -10,18 +8,7 @@ const state = {
 export default {
   namespaced: true,
   state,
-  getters: {
-    buckets,
-  },
-  actions: {
-    getByTag,
-    getTopN,
-    incr,
-    merge,
-  },
-  mutations: {
-    INCR,
-    SET,
-    PRUNE,
-  },
+  getters,
+  actions,
+  mutations,
 };
