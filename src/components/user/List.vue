@@ -12,8 +12,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import User from '@/components/user/User.vue'
-
+import User from '@/components/user/User.vue';
 
 export default {
   name: 'List',
@@ -24,8 +23,8 @@ export default {
 
   computed: {
     ...mapGetters({ users: 'users/users' }),
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

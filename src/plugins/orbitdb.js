@@ -1,4 +1,4 @@
-// TODO: make external project.
+// eslint-disable-next-line max-classes-per-file
 import Debug from 'debug';
 import Ipfs from 'ipfs';
 import OrbitDB from 'orbit-db';
@@ -30,7 +30,7 @@ class VueOrbitStore {
 
   async open(connection) {
     this.cn = connection;
-    this.hooks.beforeOpen && this.hooks.beforeOpen(this.cn);
+    if (this.hooks.beforeOpen) this.hooks.beforeOpen(this.cn);
     if (this.address) {
       this.db = await this.cn.odb.open(this.address, this.type);
     } else if (this.name) {
@@ -38,15 +38,15 @@ class VueOrbitStore {
     } else {
       throw new Error('Cannot open database, no name or address!');
     }
-    this.hooks.afterOpen && this.hooks.afterOpen(this.cn);
+    if (this.hooks.afterOpen) this.hooks.afterOpen(this.cn);
     // Hook can return false to abort load.
-    if (this.load || this.hooks.afterLoad && (
+    if (this.load || (this.hooks.afterLoad && (
       !this.hooks.beforeLoad || this.hooks.beforeLoad(this.cn) !== false
-    )) {
+    ))) {
       this.db
         .load()
         .then(() => {
-          this.hooks.afterLoad && this.hooks.afterLoad(this.cn);
+          if (this.hooks.afterLoad) this.hooks.afterLoad(this.cn);
         })
         .catch(console.error);
     }
@@ -75,7 +75,7 @@ class VueOrbitDB {
   static install() {}
 
   async connect({ options, meta }) {
-    this.hooks.beforeConnect && this.hooks.beforeConnect(this);
+    if (this.hooks.beforeConnect) this.hooks.beforeConnect(this);
     this.node = await Ipfs.create({
       ...IPFSOPTIONS,
       ...this.options,
@@ -87,13 +87,18 @@ class VueOrbitDB {
     };
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
+    const promises = [];
     for (const key in this.databases) {
       debug('opening database %s', key);
       const db = this.databases[key];
-      await db.open(this);
+      promises.push(db.open(this));
     }
-    window.$orbitdb = this;
-    this.hooks.afterConnect && this.hooks.afterConnect(this);
+    Promise
+      .all(promises)
+      .then(() => {
+        if (this.hooks.afterConnect) this.hooks.afterConnect(this);
+      })
+      .catch(console.error);
   }
 
   async shutdown() {

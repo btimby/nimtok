@@ -16,7 +16,6 @@ const TURNDOWN = new TurndownService({
   headingStle: 'atx',
 });
 
-
 export default {
   name: 'Viewer',
 
@@ -31,7 +30,7 @@ export default {
       this.$emit('input', TURNDOWN.turndown(ev.target.innerHTML));
     },
   },
-}
+};
 </script>
 
 <style scoped>

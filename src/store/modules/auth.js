@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow */
+
 import nacl from 'tweetnacl';
 import b58 from 'b58';
 import Debug from 'debug';
@@ -73,7 +75,8 @@ const actions = {
   login({ commit }, obj) {
     debug('actions.login(%O)', obj);
 
-    let { user, username, password } = obj;
+    let { user } = obj;
+    const { username, password } = obj;
 
     if (!user) {
       const auth = JSON.parse(localStorage.getItem(`auth:${username}`));

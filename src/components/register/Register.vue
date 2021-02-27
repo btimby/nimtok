@@ -112,7 +112,6 @@ import config from '@/config';
 
 const debug = Debug('nimtok:Register.vue');
 
-
 export default {
   components: {
     ChooseAvatar,
@@ -125,7 +124,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters({users: 'users/users'}),
+    ...mapGetters({ users: 'users/users' }),
   },
 
   data() {
@@ -145,19 +144,19 @@ export default {
 
       rules: {
         username: [
-          v => this.users && !this.users[v] || 'Username already used',
-          v => !!v || 'Username is required',
-          v => (v && v.length >= config.USERNAME.MIN_LENGTH && v.length <= config.USERNAME.MAX_LENGTH) || 'User must be between 8 and 32 chars',
-          v => config.PATTERN_USERNAME.test(v) || 'Username contains invalid chars.',
+          (v) => this.users && !this.users[v] || 'Username already used',
+          (v) => !!v || 'Username is required',
+          (v) => (v && v.length >= config.USERNAME.MIN_LENGTH && v.length <= config.USERNAME.MAX_LENGTH) || 'User must be between 8 and 32 chars',
+          (v) => config.PATTERN_USERNAME.test(v) || 'Username contains invalid chars.',
         ],
         email: [
-          v => !!v || 'Email is required',
-          v => config.PATTERN_EMAIL.test(v) || 'E-mail must be valid',
+          (v) => !!v || 'Email is required',
+          (v) => config.PATTERN_EMAIL.test(v) || 'E-mail must be valid',
         ],
         password: [
-          v => !!v || 'Password is required',
-          v => (v && v.length >= 8) || 'Password must be at least 8 chars.',
-          v => config.PATTERN_PASSWORD.test(v) || 'Password must contain at least lowercase letter, one number, a special character and one uppercase letter',
+          (v) => !!v || 'Password is required',
+          (v) => (v && v.length >= 8) || 'Password must be at least 8 chars.',
+          (v) => config.PATTERN_PASSWORD.test(v) || 'Password must contain at least lowercase letter, one number, a special character and one uppercase letter',
         ],
       },
 
@@ -187,7 +186,7 @@ export default {
         .catch(console.error);
     },
   },
-}
+};
 </script>
 
 <style scoped>

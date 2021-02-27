@@ -1,11 +1,15 @@
 {
   "env": {
-    "mocha": true
+    "mocha": true,
+    "browser": true
   },
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base",
+    "plugin:vue/base"
+  ],
   "plugins": [
-    "import",
-    "mocha"
+      "import",
+      "mocha"
     ],
     "globals": {
       "logger": true,
@@ -17,11 +21,11 @@
     },
     "rules": {
       "no-console": "off",
-      "no-plusplus": [
-        "error", {
-          "allowForLoopAfterthoughts": true
-        }
-      ],
+      "no-param-reassign": "off",
+      "no-plusplus": "off",
+      "import/no-unresolved": "off",
+      "no-multi-assign": "off",
+      "no-continue": "off",
       "no-restricted-syntax": "off",
       "no-underscore-dangle": "off",
       "comma-dangle": ["error", {

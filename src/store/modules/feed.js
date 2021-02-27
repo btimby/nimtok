@@ -1,3 +1,5 @@
+/* eslint-disable no-shadow */
+
 import Debug from 'debug';
 
 const debug = Debug('nimtok:store:feed');

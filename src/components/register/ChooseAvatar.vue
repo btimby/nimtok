@@ -38,8 +38,7 @@ import config from '@/config';
 import ImageUploader from 'vue-image-upload-resize';
 
 const PADDING = config.AVATAR.IMG_COUNT.toString().length;
-const BASE_URL = `${process.env.BASE_URL}${config.AVATAR.IMG_BASE}`
-
+const BASE_URL = `${process.env.BASE_URL}${config.AVATAR.IMG_BASE}`;
 
 function urlToDataUrl(url) {
   /*
@@ -139,9 +138,9 @@ export default {
 
     onUpload(data) {
       this.$emit('input', data);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>

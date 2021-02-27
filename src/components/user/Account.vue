@@ -34,7 +34,6 @@ import Identicon from './Identicon.vue';
 
 // const debug = Debug('nimtok:Account.vue');
 
-
 export default {
   name: 'Account',
 
@@ -45,7 +44,7 @@ export default {
   computed: {
     ...mapGetters({ me: 'auth/me' }),
   },
-}
+};
 </script>
 
 <style scoped>

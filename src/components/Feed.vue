@@ -49,7 +49,6 @@
 import Publish from '@/components/message/Publish';
 import UserList from '@/components/user/List';
 
-
 export default {
   components: {
     Publish,
@@ -65,7 +64,7 @@ export default {
       selected: this.tab,
     };
   },
-}
+};
 </script>
 
 <style scoped>

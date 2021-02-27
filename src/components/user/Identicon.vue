@@ -19,7 +19,6 @@ import b58 from 'b58';
 import Identicon from 'identicon.js';
 import config from '@/config';
 
-
 export default {
   props: {
     hash: String,
@@ -53,7 +52,7 @@ export default {
       return `data:image/png;base64,${base64}`;
     },
   },
-}
+};
 </script>
 
 <style scoped>

@@ -23,9 +23,9 @@ export default {
   methods: {
     onRemove(tag) {
       this.$emit('remove', tag);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

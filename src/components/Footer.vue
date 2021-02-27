@@ -21,7 +21,6 @@
 <script>
 import { mapGetters } from 'vuex';
 
-
 export default {
   computed: {
     ...mapGetters({
@@ -29,7 +28,7 @@ export default {
       authenticated: 'auth/authenticated',
     }),
   },
-}
+};
 </script>
 
 <style scoped>

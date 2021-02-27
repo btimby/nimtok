@@ -11,7 +11,6 @@
 import Identicon from '@/components/user/Identicon';
 import config from '@/config';
 
-
 export default {
   components: {
     Identicon,
@@ -36,9 +35,9 @@ export default {
       }
 
       return this.hash.slice(-8).split('').reverse().join('');
-    }
+    },
   },
-}
+};
 </script>
 
 <style scoped>

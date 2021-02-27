@@ -23,7 +23,6 @@ import { mapActions } from 'vuex';
 import Identity from '@/components/user/Identity';
 import Avatar from '@/components/user/Avatar';
 
-
 export default {
   components: {
     Identity,
@@ -41,7 +40,7 @@ export default {
 
   computed: {
     usernameOrDefault() {
-      return this.username || "Username";
+      return this.username || 'Username';
     },
   },
 
@@ -65,8 +64,8 @@ export default {
 
   methods: {
     ...mapActions({ getUser: 'users/getUser' }),
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

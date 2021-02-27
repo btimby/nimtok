@@ -15,7 +15,6 @@
 import PeerId from 'peer-id';
 import config from '@/config';
 
-
 export default {
   components: {
   },
@@ -36,8 +35,8 @@ export default {
         this.$emit('input', id.toJSON());
       });
     },
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

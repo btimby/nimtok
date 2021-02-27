@@ -81,20 +81,19 @@ const ISSUES = [
   {
     value: 123,
     label: 'Error with foo bar',
-    searchText: 'foo bar'
+    searchText: 'foo bar',
   },
   {
     value: 42,
     label: 'Cannot read line',
-    searchText: 'foo bar line'
+    searchText: 'foo bar line',
   },
   {
     value: 77,
     label: 'I have a feature suggestion',
-    searchText: 'feature'
-  }
+    searchText: 'feature',
+  },
 ];
-
 
 export default {
   components: {
@@ -117,7 +116,7 @@ export default {
       if (this.body) {
         const m = [...this.body.matchAll(PATTERN_HASHTAG)];
 
-        for (let i in m) {
+        for (const i in m) {
           hashtags[m[i][2].toLowerCase()] = null;
         }
       }
@@ -131,7 +130,7 @@ export default {
       if (this.body) {
         const m = [...this.body.matchAll(PATTERN_MENTION)];
 
-        for (let i in m) {
+        for (const i in m) {
           mentions[m[i][1]] = null;
         }
       }
@@ -156,9 +155,9 @@ export default {
 
     onOpen(key) {
       this.items = key === '@' ? USERS : ISSUES;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -46,6 +46,7 @@ const orbitdb = new VueOrbitDB({
   meta: {
     Sync,
   },
+  // eslint-disable-next-line no-shadow
   afterConnect(orbitdb) {
     debug('connection:afterConnect(%O)', orbitdb);
 

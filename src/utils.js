@@ -34,7 +34,7 @@ function invert(o) {
   const keys = Object.keys(o);
   const vals = Object.keys(o);
 
-  for (const i in keys) {
+  for (let i = 0; i < keys.length; i++) {
     inverted[vals[i]] = keys[i];
   }
 

@@ -13,7 +13,6 @@ import Debug from 'debug';
 
 const debug = Debug('nimtok:Logout.vue');
 
-
 export default {
   props: {
     next: null,
@@ -34,9 +33,9 @@ export default {
           }
         })
         .catch(console.error);
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

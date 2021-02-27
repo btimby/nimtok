@@ -36,7 +36,6 @@
 <script>
 import Viewer from '@/components/message/Viewer';
 
-
 export default {
   name: 'Editor',
 
@@ -63,8 +62,8 @@ export default {
     onInput(value) {
       this.$emit('input', value);
     },
-  }
-}
+  },
+};
 </script>
 
 <style scoped>

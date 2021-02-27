@@ -38,7 +38,6 @@ import Register from '@/components/register/Register';
 import Footer from '@/components/Footer';
 import { mapGetters } from 'vuex';
 
-
 export default {
   name: 'App',
 

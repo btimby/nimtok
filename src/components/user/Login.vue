@@ -102,7 +102,6 @@ import User from '@/components/user/User';
 
 const debug = Debug('nimtok:Login.vue');
 
-
 export default {
   components: {
     User,
@@ -165,10 +164,10 @@ export default {
 
       rules: {
         username: [
-          v => !!v || 'Username is required',
+          (v) => !!v || 'Username is required',
         ],
         password: [
-          v => !!v || 'Password is required',
+          (v) => !!v || 'Password is required',
         ],
       },
     };
@@ -195,11 +194,10 @@ export default {
 
       try {
         user = JSON.parse(sessionStorage.getItem('auth:me'));
-
       } catch (e) {
         console.error(e);
         console.warn('User not present in sessionStorage');
-      }    
+      }
 
       if (user) {
         this.$store
@@ -217,9 +215,9 @@ export default {
         this.$router.push(this.next);
       }
       this.dialog = false;
-    }
+    },
   },
-}
+};
 </script>
 
 <style scoped>

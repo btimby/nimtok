@@ -19,7 +19,6 @@ import { isId } from '@/utils';
 
 const debug = Debug('nimtok:Avatar.vue');
 
-
 export default {
   props: {
     value: String,
@@ -43,21 +42,19 @@ export default {
       if (this.value.startsWith('data:image/png;base64,')) {
         // Data URI
         return this.value;
-      } else if (this.value.startsWith('http') || this.value.startsWith('//')) {
+      } if (this.value.startsWith('http') || this.value.startsWith('//')) {
         // Actual http(s) URL.
         return this.value;
-      } else if (isId(this.value)) {
+      } if (isId(this.value)) {
         // The image is a CID, so the file is store in ipfs.
         if (config.AVATAR_USE_GATEWAY) {
           // Let a gateway fetch it for us.
           return `${config.IPFS_GATEWAY_URL}ipfs/${this.value}`;
-        } else {
-          // Fetch it directly from ipfs.
-          return await this.loadImage(this.value);
         }
-      } else {
-        debug('Could not determine image type');
+        // Fetch it directly from ipfs.
+        return await this.loadImage(this.value);
       }
+      debug('Could not determine image type');
     },
   },
 
@@ -66,7 +63,7 @@ export default {
       const parts = [];
 
       for await (const chunk of orbitdb.node.cat(cid)) {
-        debug('Got chunk of %i bytes', chunk.length)
+        debug('Got chunk of %i bytes', chunk.length);
         parts.push(chunk);
       }
 
@@ -77,15 +74,15 @@ export default {
         try {
           reader.onload = (e) => {
             resolve(e.target.result);
-          }
+          };
           reader.readAsDataURL(blob);
-        } catch(e) {
+        } catch (e) {
           reject(e);
         }
       });
-    }
+    },
   },
-}
+};
 </script>
 
 <style scoped>
