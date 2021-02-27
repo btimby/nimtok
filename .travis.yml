@@ -3,4 +3,8 @@ node_js:
   - 12
 script:
   - make ci
-
+deploy:
+  provider: script
+  script: make deploy
+  on:
+    branch: master
