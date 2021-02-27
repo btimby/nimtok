@@ -112,7 +112,7 @@ export default {
       // Ensure we don't pick the same number...
       do {
         random = Math.round(Math.random() * config.AVATAR.IMG_COUNT);
-      } while (this.index == random);
+      } while (this.index === random);
       this.index = random;
       this.update();
     },

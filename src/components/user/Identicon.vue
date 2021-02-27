@@ -41,7 +41,7 @@ export default {
 
     identicon() {
       if (!this.hash) {
-        return;
+        return null;
       }
 
       const base64 = new Identicon(this.hex, {

@@ -64,7 +64,9 @@
                 <v-list-item>
                   <v-list-item-avatar color="gray"></v-list-item-avatar>
                   <v-list-item-content>
-                    <v-list-item-title class="headline">How the world will see you.</v-list-item-title>
+                    <v-list-item-title class="headline">
+                      How the world will see you.
+                    </v-list-item-title>
                   </v-list-item-content>
                 </v-list-item>
                 <User
@@ -144,7 +146,7 @@ export default {
 
       rules: {
         username: [
-          (v) => this.users && !this.users[v] || 'Username already used',
+          (v) => (this.users && !this.users[v]) || 'Username already used',
           (v) => !!v || 'Username is required',
           (v) => (v && v.length >= config.USERNAME.MIN_LENGTH && v.length <= config.USERNAME.MAX_LENGTH) || 'User must be between 8 and 32 chars',
           (v) => config.PATTERN_USERNAME.test(v) || 'Username contains invalid chars.',

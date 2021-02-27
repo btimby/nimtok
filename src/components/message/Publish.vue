@@ -116,7 +116,7 @@ export default {
       if (this.body) {
         const m = [...this.body.matchAll(PATTERN_HASHTAG)];
 
-        for (const i in m) {
+        for (let i = 0; i < m.length; i++) {
           hashtags[m[i][2].toLowerCase()] = null;
         }
       }
@@ -130,7 +130,7 @@ export default {
       if (this.body) {
         const m = [...this.body.matchAll(PATTERN_MENTION)];
 
-        for (const i in m) {
+        for (let i = 0; i < m.length; i++) {
           mentions[m[i][1]] = null;
         }
       }

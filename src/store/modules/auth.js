@@ -188,7 +188,7 @@ const actions = {
 
               profile.db.set('avatar', avatar.path);
               profile.db.set('bio', user.bio);
-              auth.profile = profile.db.id;
+              auth.profileId = profile.db.id;
 
               // Save user to session (for persistent login).
               commit('SET_ME', auth);

@@ -26,6 +26,7 @@
       "import/no-unresolved": "off",
       "no-multi-assign": "off",
       "no-continue": "off",
+      "no-return-await": "off",
       "no-restricted-syntax": "off",
       "no-underscore-dangle": "off",
       "comma-dangle": ["error", {

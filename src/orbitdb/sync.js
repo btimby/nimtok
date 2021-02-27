@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Debug from 'debug';
 import store from '@/store';
 import peers from '@/orbitdb/peers';
@@ -11,7 +12,7 @@ const Sync = {
       debug('postToFeed(%O)', obj);
 
       const {
-        type, hashtags, mentions, posts, cid,
+        type, hashtags, mentions, postsId, cid,
       } = obj.data;
       if (type !== 'post') {
         debug('pubsub:following:%s skipping', obj.message.from);
@@ -21,7 +22,7 @@ const Sync = {
       store.dispatch('feed/addPost', {
         user: { id: obj.message.from },
         post: { cid },
-        posts,
+        postsId,
       });
 
       store.dispatch('hashtags/incr', hashtags);
@@ -33,15 +34,12 @@ const Sync = {
 
       const peerList = peers.db.query(() => true);
 
-      for (const i in peerList) {
-        // Transform the object somewhat.
-        const peer = { ...peerList[i] };
+      _.each(peerList, (peer) => {
         peer.id = peer._id;
         peer._srcOrbitDB = true;
         delete peer._id;
-
         Sync.ToVuex.user(orbitdb, peer);
-      }
+      });
     },
 
     user(orbitdb, user) {
@@ -49,7 +47,7 @@ const Sync = {
 
       // Get profile data.
       orbitdb.odb
-        .open(user.profile)
+        .open(user.profileId)
         .then((profile) => {
           profile
             .load()
@@ -85,7 +83,7 @@ const Sync = {
           _id: peer.id,
           id: peer.id,
           username: peer.username,
-          profile: peer.profile,
+          profileId: peer.profileId,
         })
         .catch(console.error);
     },
@@ -99,7 +97,7 @@ const Sync = {
           orbitdb.publish(orbitdb.id.id, {
             type: 'post',
             cid,
-            posts: orbitdb.databases.posts.db.id,
+            postsId: orbitdb.databases.posts.db.id,
             hashtags: post.hashtags,
             mentions: post.mentions,
           });

@@ -36,7 +36,7 @@ export default {
   asyncComputed: {
     async src() {
       if (!this.value) {
-        return;
+        return null;
       }
 
       if (this.value.startsWith('data:image/png;base64,')) {
@@ -55,6 +55,7 @@ export default {
         return await this.loadImage(this.value);
       }
       debug('Could not determine image type');
+      return null;
     },
   },
 

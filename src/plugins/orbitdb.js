@@ -1,4 +1,5 @@
-// eslint-disable-next-line max-classes-per-file
+/* eslint-disable max-classes-per-file */
+import _ from 'lodash';
 import Debug from 'debug';
 import Ipfs from 'ipfs';
 import OrbitDB from 'orbit-db';
@@ -88,11 +89,10 @@ class VueOrbitDB {
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
     const promises = [];
-    for (const key in this.databases) {
-      debug('opening database %s', key);
-      const db = this.databases[key];
+    _.forOwn(this.databases, (db, name) => {
+      debug('opening database %s', name);
       promises.push(db.open(this));
-    }
+    });
     Promise
       .all(promises)
       .then(() => {
@@ -146,14 +146,8 @@ class VueOrbitDB {
     const data = JSON.parse(message.data.toString());
     const args = { data, message, odb: this };
 
-    for (const i in message.topicIDs) {
-      const topic = message.topicIDs[i];
-
-      if (!this._actions.has(topic)) {
-        continue;
-      }
-
-      this._actions.get(topic).forEach((action) => {
+    _.each(message.topicIDs, (topic) => {
+      _.each(this._actions.get(topic), (action) => {
         if (typeof action === 'string') {
           this._store.dispatch(action, args);
         } else {
@@ -164,7 +158,7 @@ class VueOrbitDB {
           }
         }
       });
-    }
+    });
   }
 
   async subscribe(topic, action) {

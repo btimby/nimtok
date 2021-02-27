@@ -31,7 +31,7 @@ export default {
   computed: {
     shortCode() {
       if (!this.hash) {
-        return;
+        return null;
       }
 
       return this.hash.slice(-8).split('').reverse().join('');

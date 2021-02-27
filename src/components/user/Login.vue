@@ -73,7 +73,8 @@
             <v-col>
               <p>
                 Account not listed?
-                <a href="">Import</a> an existing account, or <router-link to="/register">register</router-link> a new one.
+                <a href="">Import</a> an existing account, or
+                <router-link to="/register">register</router-link> a new one.
               </p>
             </v-col>
           </v-row>
@@ -134,6 +135,7 @@ export default {
   mounted() {
     let key;
 
+    // eslint-disable-next-line no-cond-assign
     for (let i = 0; (key = localStorage.key(i)); i++) {
       if (!key.startsWith('auth:')) {
         continue;

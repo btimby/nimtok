@@ -60,7 +60,7 @@ const orbitdb = new VueOrbitDB({
     const nodeInfo = {
       type: 'discovery',
       username: orbitdb.meta.user.username,
-      profile: profile.db.id,
+      profileId: profile.db.id,
     };
 
     // Set up pubsub.
@@ -84,7 +84,7 @@ const orbitdb = new VueOrbitDB({
       Sync.ToVuex.user(orbitdb, {
         id: obj.message.from,
         username: obj.data.username,
-        profile: obj.data.profile,
+        profileId: obj.data.profileId,
       });
 
       Sync.ToVuex.hashtags(obj.hashtags);

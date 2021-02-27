@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Debug from 'debug';
 import { getHourBucket, invert } from '@/utils';
 import config from '@/config';
@@ -21,7 +22,7 @@ const actions = {
     };
     const buckets = Object.keys(state.buckets);
 
-    for (const i in buckets) {
+    for (let i = 0; i < buckets.length; i++) {
       const key = buckets[i];
       const bucket = state.buckets[key];
       const count = bucket[tag];
@@ -39,14 +40,14 @@ const actions = {
 
     const buckets = {};
 
-    for (const hour in state.buckets) {
-      const bucket = invert(state.buckets[hour]);
-      const topN = Object.keys(bucket).sort().reverse().slice(0, n);
+    _.forOwn(state.buckets, (bucket, hour) => {
+      const inverted = invert(bucket);
+      const topN = Object.keys(inverted).sort().reverse().slice(0, n);
 
-      for (const i in topN) {
+      for (let i = 0; i < topN.length; i++) {
         buckets[hour][bucket[topN[i]]] = topN[i];
       }
-    }
+    });
 
     return buckets;
   },
@@ -56,7 +57,7 @@ const actions = {
 
     commit('PRUNE');
 
-    for (const i in tags) {
+    for (let i = 0; i < tags.length; i++) {
       commit('INCR', tags[i], n);
     }
   },
@@ -64,16 +65,15 @@ const actions = {
   merge({ commit, state }, buckets) {
     debug('actions.merge(%O, %i)', buckets);
 
-    for (const hour in buckets) {
-      for (const tag in buckets[hour]) {
-        const bucket = state.buckets[hour];
-        const n = buckets[hour][tag];
+    _.forOwn(buckets, (bucket, hour) => {
+      _.forOwn(bucket, (n, tag) => {
+        const stateBucket = state.buckets[hour];
 
-        if (!bucket || bucket[tag] < n) {
+        if (!stateBucket || stateBucket[tag] < n) {
           commit('SET', hour, tag, n);
         }
-      }
-    }
+      });
+    });
   },
 };
 

@@ -19,6 +19,7 @@
     "ipfs": "^0.54.2",
     "ipfs-deploy": "git+https://github.com/btimby/ipfs-deploy.git",
     "libp2p-webrtc-star": "^0.21.1",
+    "lodash": "^4.17.21",
     "multihashes": "^3.1.2",
     "orbit-db": "^0.26.0",
     "peer-id": "^0.14.3",
