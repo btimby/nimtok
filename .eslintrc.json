@@ -3,6 +3,9 @@
     "mocha": true,
     "browser": true
   },
+  "ignorePatterns": [
+    "tests/**/*"
+  ],
   "extends": [
     "airbnb-base",
     "plugin:vue/base"
