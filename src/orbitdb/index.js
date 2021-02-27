@@ -16,7 +16,6 @@ Vue.use(VueOrbitDB);
 
 const debug = Debug('nimtok:orbitdb');
 
-
 const orbitdb = new VueOrbitDB({
   store,
   databases: {
@@ -45,7 +44,7 @@ const orbitdb = new VueOrbitDB({
     },
   },
   meta: {
-    Sync: Sync,
+    Sync,
   },
   afterConnect(orbitdb) {
     debug('connection:afterConnect(%O)', orbitdb);
@@ -95,7 +94,7 @@ const orbitdb = new VueOrbitDB({
 
       // We don't include hashtags since we just started up.
       orbitdb.publish('discovery', nodeInfo);
-    }, config.DISCOVERY_WAIT);  
+    }, config.DISCOVERY_WAIT);
   },
 });
 
@@ -122,6 +121,5 @@ store.subscribe((mutation, state) => {
       break;
   }
 });
-
 
 export default orbitdb;

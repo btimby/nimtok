@@ -5,12 +5,13 @@ import posts from '@/orbitdb/posts';
 
 const debug = Debug('nimtok:orbitdb:sync');
 
-
 class ToVuex {
   static postToFeed(orbitdb, obj) {
     debug('postToFeed(%O)', obj);
 
-    const { type, hashtags, mentions, posts, cid } = obj.data;
+    const {
+      type, hashtags, mentions, posts, cid,
+    } = obj.data;
     if (type !== 'post') {
       debug('pubsub:following:%s skipping', obj.message.from);
       return;
@@ -18,7 +19,7 @@ class ToVuex {
 
     store.dispatch('feed/addPost', {
       user: { id: obj.message.from },
-      post: { cid, },
+      post: { cid },
       posts,
     });
 
@@ -31,7 +32,7 @@ class ToVuex {
 
     const peerList = peers.db.query(() => true);
 
-    for (let i in peerList) {
+    for (const i in peerList) {
       // Transform the object somewhat.
       const peer = { ...peerList[i] };
       peer.id = peer._id;
@@ -39,7 +40,7 @@ class ToVuex {
       delete peer._id;
 
       Sync.ToVuex.user(orbitdb, peer);
-    }  
+    }
   }
 
   static user(orbitdb, user) {
@@ -68,13 +69,13 @@ class ToVuex {
       })
       .catch(console.error);
   }
-  
+
   static hashtags(hashtags) {
-    hashtags &&
-      store.dispatch('hashtags/merge', hashtags);
+    hashtags
+      && store.dispatch('hashtags/merge', hashtags);
   }
 }
-  
+
 class ToOrbitDB {
   static peer(orbitdb, peer) {
     debug('Sync.ToOrbitDB.peer(%O)', peer);
@@ -104,7 +105,7 @@ class ToOrbitDB {
         });
       })
       .catch(console.error);
-  }  
+  }
 }
 
 // Just a namespace to contain functions for copying data between vuex and OrbitDB.
@@ -112,6 +113,5 @@ const Sync = {
   ToVuex,
   ToOrbitDB,
 };
-
 
 export default Sync;

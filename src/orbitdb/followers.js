@@ -3,7 +3,6 @@ import { VueOrbitStore } from '@/plugins/orbitdb';
 
 const debug = Debug('nimtok:orbitdb:followers');
 
-
 const followers = new VueOrbitStore('followers', 'docstore', {
   createOptions: {
     accessController: {

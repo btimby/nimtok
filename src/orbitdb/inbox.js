@@ -3,7 +3,6 @@ import { VueOrbitStore } from '@/plugins/orbitdb';
 
 const debug = Debug('nimtok:orbitdb:inbox');
 
-
 const inbox = new VueOrbitStore('inbox', 'feed', {
   createOptions: {
     accessController: {
@@ -18,6 +17,5 @@ const inbox = new VueOrbitStore('inbox', 'feed', {
     });
   },
 });
-
 
 export default inbox;

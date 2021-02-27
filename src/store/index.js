@@ -6,7 +6,6 @@ import posts from '@/store/modules/posts';
 import hashtags from '@/store/modules/hashtags';
 import mentions from '@/store/modules/mentions';
 
-
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -16,8 +15,7 @@ const store = new Vuex.Store({
     posts,
     hashtags,
     mentions,
-  }
+  },
 });
-
 
 export default store;

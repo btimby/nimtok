@@ -1,0 +1,35 @@
+{
+  "env": {
+    "mocha": true
+  },
+  "extends": "airbnb-base",
+  "plugins": [
+    "import",
+    "mocha"
+    ],
+    "globals": {
+      "logger": true,
+      "exceptions": true,
+      "td": true,
+      "assert": true,
+      "Assertion": true,
+      "AssertionError": true
+    },
+    "rules": {
+      "no-console": "off",
+      "no-plusplus": [
+        "error", {
+          "allowForLoopAfterthoughts": true
+        }
+      ],
+      "no-restricted-syntax": "off",
+      "no-underscore-dangle": "off",
+      "comma-dangle": ["error", {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "only-multiline"
+      }]
+    }
+}

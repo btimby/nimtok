@@ -4,7 +4,6 @@ import b58 from 'b58';
 const ENCODER = new TextEncoder();
 const DECODER = new TextDecoder();
 
-
 function isId(s) {
   // NOTE: QmViiHeEFRJE1FcN2K5QJnVxCND1bSAq2DZv8R1KeTLQCY
   try {
@@ -35,7 +34,7 @@ function invert(o) {
   const keys = Object.keys(o);
   const vals = Object.keys(o);
 
-  for (let i in keys) {
+  for (const i in keys) {
     inverted[vals[i]] = keys[i];
   }
 

@@ -26,7 +26,7 @@ const actions = {
       idOrUsername = state.username2Id[idOrUsername];
     }
 
-    let user = state.users[idOrUsername];
+    const user = state.users[idOrUsername];
     return user;
   },
 };
@@ -39,13 +39,12 @@ const mutations = {
     state.users = {
       ...state.users,
       [obj.id]: obj,
-    }
+    };
 
     state.username2Id[obj.username] = obj.id;
     state.userCount = Object.keys(state.users).length;
   },
 };
-
 
 export default {
   namespaced: true,

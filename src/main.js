@@ -8,9 +8,9 @@ import orbitdb from '@/orbitdb';
 import store from '@/store';
 import vuetify from '@/vuetify';
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 // TODO: remove logging...
-// window.LOG = 'orbit*'; 
+// window.LOG = 'orbit*';
 // localStorage.setItem('debug', 'ipfs:*');
 localStorage.setItem('debug', 'nimtok:*');
 // localStorage.removeItem('debug');
@@ -19,11 +19,10 @@ Vue.use(Vue2Filters);
 Vue.use(VueAsyncComputed);
 Vue.use(VTooltip);
 
-
 new Vue({
   vuetify,
   store,
   router,
   orbitdb,
-  render: h => h(App),
+  render: (h) => h(App),
 }).$mount('#app');

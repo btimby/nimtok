@@ -1,20 +1,17 @@
 import Debug from 'debug';
 import store from '@/store';
 
-
 const debug = Debug('nimtok:store:posts');
 const state = {
   posts: {},
 };
 
 const getters = {
-  posts: state => {
-    return state.posts;
-  },
+  posts: (state) => state.posts,
 };
 
 const actions = {
-  post({ commit}, obj) {
+  post({ commit }, obj) {
     debug('actions.post(%O)', obj);
 
     store.dispatch('hashtags/incr', obj.hashtags);
@@ -22,7 +19,7 @@ const actions = {
 
     const me = store.getters['auth/me'];
     commit('ADD_POST', {
-      user: { id: me.id, },
+      user: { id: me.id },
       body: obj.body,
       hashtags: obj.hashtags,
       mentions: obj.mentions,
@@ -41,7 +38,6 @@ const mutations = {
     posts.push(obj.body);
   },
 };
-
 
 export default {
   namespaced: true,

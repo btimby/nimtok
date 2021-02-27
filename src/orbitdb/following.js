@@ -3,7 +3,6 @@ import { VueOrbitStore } from '@/plugins/orbitdb';
 
 const debug = Debug('nimtok:orbitdb:following');
 
-
 const following = new VueOrbitStore('following', 'docstore', {
   afterOpen(orbitdb) {
     debug('following.afterOpen');
@@ -12,7 +11,7 @@ const following = new VueOrbitStore('following', 'docstore', {
     following.db.events.on('ready', () => {
       const peerList = following.db.query(() => true);
 
-      for (let i in peerList) {
+      for (const i in peerList) {
         const peer = peerList[i];
         const peerId = peer.id || peer._id;
 
@@ -25,6 +24,5 @@ const following = new VueOrbitStore('following', 'docstore', {
     following.db.load();
   },
 });
-
 
 export default following;

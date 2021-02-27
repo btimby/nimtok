@@ -3,7 +3,6 @@ import VueRouter from 'vue-router';
 import Home from '@/components/Home';
 import Feed from '@/components/Feed';
 
-
 Vue.use(VueRouter);
 
 const router = new VueRouter({
@@ -17,10 +16,9 @@ const router = new VueRouter({
       path: '/feed',
       name: 'feed',
       component: Feed,
-      props: route => ({ selected: route.query.tab }),
-    }
+      props: (route) => ({ selected: route.query.tab }),
+    },
   ],
 });
-
 
 export default router;

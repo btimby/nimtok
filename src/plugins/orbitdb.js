@@ -8,9 +8,8 @@ const DB_ADDR = /'(\/orbitdb\/\w+\/\w+)'/;
 const IPFSOPTIONS = {
   EXPERIMENTAL: {
     pubsub: true,
-  }
-}
-
+  },
+};
 
 class VueOrbitStore {
   constructor(name, type, options) {
@@ -55,7 +54,9 @@ class VueOrbitStore {
 }
 
 class VueOrbitDB {
-  constructor({ store, databases, options, beforeConnect, afterConnect, meta, }) {
+  constructor({
+    store, databases, options, beforeConnect, afterConnect, meta,
+  }) {
     this._store = store;
     this._actions = new Map();
     this.node = null;
@@ -86,7 +87,7 @@ class VueOrbitDB {
     };
     this.odb = await OrbitDB.createInstance(this.node);
     this.id = await this.node.id();
-    for (let key in this.databases) {
+    for (const key in this.databases) {
       debug('opening database %s', key);
       const db = this.databases[key];
       await db.open(this);
@@ -140,7 +141,7 @@ class VueOrbitDB {
     const data = JSON.parse(message.data.toString());
     const args = { data, message, odb: this };
 
-    for (let i in message.topicIDs) {
+    for (const i in message.topicIDs) {
       const topic = message.topicIDs[i];
 
       if (!this._actions.has(topic)) {
@@ -153,7 +154,7 @@ class VueOrbitDB {
         } else {
           try {
             action(args);
-          } catch(e) {
+          } catch (e) {
             console.error(e);
           }
         }
@@ -185,7 +186,6 @@ class VueOrbitDB {
     await this.node.pubsub.publish(topic, data);
   }
 }
-
 
 export {
   VueOrbitStore,

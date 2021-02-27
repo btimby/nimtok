@@ -1,15 +1,12 @@
 import Debug from 'debug';
 
-
 const debug = Debug('nimtok:store:alerts');
 const state = {
   alerts: [],
 };
 
 const getters = {
-  alerts: state => {
-    return state.alerts;
-  },
+  alerts: (state) => state.alerts,
 };
 
 const actions = {
@@ -19,7 +16,7 @@ const actions = {
     commit('ADD_ALERT', obj);
   },
 };
-  
+
 const mutations = {
   ADD_ALERT(state, obj) {
     debug('mutations.addAlert(%O)', obj);
@@ -27,7 +24,6 @@ const mutations = {
     state.alerts.push(obj);
   },
 };
-
 
 export default {
   namespaced: true,

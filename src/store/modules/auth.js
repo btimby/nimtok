@@ -53,24 +53,20 @@ function deserializeUser(obj, password) {
 }
 
 function getImageData(dataUri) {
-  let dataStr = atob(dataUri.split(',')[1]);
+  const dataStr = atob(dataUri.split(',')[1]);
   const dataArr = new Uint8Array(dataStr.length);
 
   for (let i = 0; i < dataStr.length; i++) {
-      dataArr[i] = dataStr.charCodeAt(i);
+    dataArr[i] = dataStr.charCodeAt(i);
   }
 
   return new Blob([dataArr]);
 }
 
 const getters = {
-  me: state => {
-    return state.me;
-  },
+  me: (state) => state.me,
 
-  authenticated: state => {
-    return Boolean(state.me);
-  },
+  authenticated: (state) => Boolean(state.me),
 };
 
 const actions = {
@@ -84,9 +80,9 @@ const actions = {
       if (!auth) {
         throw new Error('Invalid username or password');
       }
-  
+
       user = deserializeUser(auth, password);
-  
+
       if (user === null) {
         throw new Error('Invalid username or password');
       }
@@ -101,7 +97,7 @@ const actions = {
           },
           meta: {
             user,
-          }
+          },
         })
         .then(() => {
           // Don't store sensitive fields in session.
@@ -138,19 +134,19 @@ const actions = {
       if (!user.username || !user.password) {
         throw new Error('Invalid user, must have username and password.');
       }
-  
+
       const auth = serializeUser(user);
-  
+
       debug('actions.create() - connecting.');
       orbitdb.connect({
-          options: {
-            repo: user.username,
-            privateKey: user.identity.privKey,
-          },
-          meta: {
-            user,
-          },
-        })
+        options: {
+          repo: user.username,
+          privateKey: user.identity.privKey,
+        },
+        meta: {
+          user,
+        },
+      })
         .then(() => {
           debug('actions.create() - uploading avatar.');
 
@@ -159,7 +155,7 @@ const actions = {
             let blob;
             try {
               blob = getImageData(user.avatar);
-            } catch(e) {
+            } catch (e) {
               reject(e);
               return;
             }
@@ -172,7 +168,7 @@ const actions = {
           // Open the profile database for writing.
           const prom2 = new Promise((resolve, reject) => {
             try {
-              const profile = orbitdb.databases.profile;
+              const { profile } = orbitdb.databases;
               profile.db.events.on('ready', () => {
                 resolve(profile);
               });
@@ -199,7 +195,7 @@ const actions = {
         })
         .catch(reject);
     });
-  }
+  },
 };
 
 const mutations = {
@@ -215,7 +211,6 @@ const mutations = {
     state.me = undefined;
   },
 };
-
 
 export default {
   namespaced: true,

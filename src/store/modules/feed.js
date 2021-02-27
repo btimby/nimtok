@@ -1,18 +1,15 @@
 import Debug from 'debug';
 
-
 const debug = Debug('nimtok:store:feed');
 const state = {
   feed: [],
   new: {
     posts: 0,
-  }
+  },
 };
 
 const getters = {
-  feed: state => {
-    return state.feed;
-  },
+  feed: (state) => state.feed,
 };
 
 const actions = {
@@ -31,7 +28,6 @@ const mutations = {
     state.new.posts++;
   },
 };
-
 
 export default {
   namespaced: true,

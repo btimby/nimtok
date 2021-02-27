@@ -1,9 +1,8 @@
-import { getters, actions, mutations, } from '@/store/modules/buckets';
+import { getters, actions, mutations } from '@/store/modules/buckets';
 
 const state = {
   buckets: {},
 };
-
 
 export default {
   namespaced: true,
