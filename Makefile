@@ -13,7 +13,7 @@ lint:
 test:
 	npm run test
 
-ci: lint tests
+ci: lint
 
 deploy: build
 	node_modules/.bin/ipfs-deploy dist -d dreamhost

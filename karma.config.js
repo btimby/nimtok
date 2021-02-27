@@ -8,9 +8,7 @@ module.exports = (config) => {
     preprocessors: {
       'tests/**/test_*.js': ['webpack'],
     },
-    webpack: {
-
-    },
+    webpack: {},
     reporters: ['coverage', 'progress'],
     port: 9876,
     colors: true,
